@@ -5,9 +5,6 @@
 .idea/*
 dist
 dist/*
-js
-js/*
-index.html
 node_modules
 node_modules/*
 
