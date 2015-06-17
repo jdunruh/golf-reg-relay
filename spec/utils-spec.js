@@ -1,9 +1,10 @@
 utils = require('../src/js/common/utils.js');
+im = require('immutable');
 
-describe("determine if a player is already scheduled for a tee time", function () {
-    var db = {flights: [{time: "10:36", position: 0, players: ["Joe", "Billy Bob", "Spike", "Karen"], maxPlayers: 4},
-        {time: "10:42", position: 1, players: ["Annie", "Tommy"], maxPlayers: 4},
-        {time: "10:48", position: 2, players: [], maxPlayers: 2}]};
+describe("inTeeList", function () {
+    var db = im.Map({flights: im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+        im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 4}),
+        im.Map({time: "10:48", position: 2, players: im.Set([]), maxPlayers: 2}))});
 
     it("can determine if a player is currently not on the tee list", function () {
 
@@ -14,40 +15,42 @@ describe("determine if a player is already scheduled for a tee time", function (
     });
 });
 
-describe("find the flights with availability", function() {
-    it("returns an array of flights with availability", function() {
-        var db = [{time: "10:36", position: 0, players: ["Joe", "Billy Bob", "Spike", "Karen"], maxPlayers: 4},
-            {time: "10:42", position: 1, players: ["Annie", "Tommy"], maxPlayers: 4},
-            {time: "10:48", position: 2, players: [], maxPlayers: 2}];
+describe("availableFilghts", function() {
+    var db = im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+        im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 4}),
+        im.Map({time: "10:48", position: 2, players: im.Set([]), maxPlayers: 2}));
 
-        expect(utils.availableFlights(db)[0].time).toEqual("10:42");
-        expect(utils.availableFlights(db)[1].time).toEqual("10:48");
+    it("returns an array of flights with availability", function() {
+
+        expect(utils.availableFlights(db).getIn([0, "time"])).toEqual("10:42");
+        expect(utils.availableFlights(db).getIn([1, "time"])).toEqual("10:48");
     });
 
     it("returns an empty array when all flights are full", function() {
-        var db = [{time: "10:36", position: 0, players: ["Joe", "Billy Bob", "Spike", "Karen"], maxPlayers: 4},
-            {time: "10:42", position: 1, players: ["Annie", "Tommy"], maxPlayers: 2},
-            {time: "10:48", position: 2, players: ["Ben", "Tammy"], maxPlayers: 2}];
-        expect(utils.availableFlights(db)).toEqual([]);
+        var db = im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+            im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 2}),
+            im.Map({time: "10:48", position: 2, players: im.Set(["Ben", "Tammy"]), maxPlayers: 2}));
+
+        expect(utils.availableFlights(db)).toEqual(im.List.of());
     });
 
     it("returns an empty array when the db is empty", function() {
-        expect(utils.availableFlights([])).toEqual([]);
+        expect(utils.availableFlights(im.List.of())).toEqual(im.List.of());
     });
 });
 
-describe("determine if a flight is full", function () {
-    var db = [{time: "10:36", position: 0, players: ["Joe", "Billy Bob", "Spike", "Karen"], maxPlayers: 4},
-        {time: "10:42", position: 1,players: ["Annie", "Tommy"], maxPlayers: 4},
-        {time: "10:48", position: 2, players: [], maxPlayers: 2}];
+describe("flightFull", function () {
+    var db = im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+        im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 4}),
+        im.Map({time: "10:48", position: 2, players: im.Set([]), maxPlayers: 2}));
 
     it("can determine if a full flight is full", function () {
-        expect(utils.flightFull(db[0])).toBe(true);
+        expect(utils.flightFull(db.get(0))).toBe(true);
     });
     it("can determine that a flight that is not full is not full", function () {
-        expect(utils.flightFull(db[1])).toBe(false);
+        expect(utils.flightFull(db.get(1))).toBe(false);
     });
     it("can determine that an empty flight is not full", function () {
-        expect(utils.flightFull(db[2])).toBe(false);
+        expect(utils.flightFull(db.get(2))).toBe(false);
     });
 });
