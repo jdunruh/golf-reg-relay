@@ -1,6 +1,16 @@
 im = require('immutable');
 store = require('../src/js/stores/store.js');
 
+// global immutables used over many tests
+    var flight1 = store.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
+    var flight2 = store.newFlight(2, "1026", im.Set(["Tommy", "Annie"]));
+    var flight3 = store.newFlight(4, "10:32", im.Set([]));
+
+beforeEach(function() {
+    store.resetDB();
+    store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
+});
+
 describe("A Flight", function() {
     it("Can be created", function() {
         expect(store.newFlight(4, "10:20").get("time")).toEqual("10:20");
@@ -11,10 +21,6 @@ describe("A Flight", function() {
 });
 
 describe("An Event", function() {
-    var flight1 = store.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
-    var flight2 = store.newFlight(2, "1026", im.Set(["Tommy", "Annie"]));
-    var flight3 = store.newFlight(4, "10:32", im.Set([]));
-
    it("Can be created", function() {
        var event = store.newEvent("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3))
        expect(event.get("date")).toEqual("Tuesday");
@@ -23,23 +29,16 @@ describe("An Event", function() {
    });
 
     it("Can be added to the DB and then retrieved", function() {
-        store.resetDB();
-        store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
         expect(store.getEventsFromDB().size).toEqual(1);
     });
 
     it("can be removed", function() {
-        store.resetDB();
-        store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
         store.removeEventFromDB(0);
         expect(store.getEventsFromDB().size).toEqual(0);
     })
 });
 
 describe("A player", function() {
-    var flight1 = store.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
-    var flight2 = store.newFlight(2, "10:26", im.Set(["Tommy", "Annie"]));
-    var flight3 = store.newFlight(4, "10:32", im.Set());
     store.resetDB();
     store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 
