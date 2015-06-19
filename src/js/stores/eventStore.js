@@ -57,6 +57,29 @@ var removeEventFromDB = function(event) {
         (coll) => coll.take(event).concat(coll.takeLast(coll.size - event - 1)));
 };
 
+// A little syntactic sugar to fill in the second arg needed
+// in the recursive function on the first call for the user
+var fromJSCustom = function(js) {
+    return fromJSCustom1(js, null)
+};
+
+// players are represented as a Set, other JSON arrays represent Lists
+// expects to get JS converted to immutable Seq from fromJNCustom1
+var fromJSArray = function(js, key) {
+    return key === "players" ? js.toSet() : js.toList();
+};
+
+// recursive function to convort JS structure to immutable as
+// in the form needed for this application. The JS structure has
+// the form of JSON converted to JS as the result of an HTTP request.
+var fromJSCustom1 = function(js, key) {
+    console.log(js);
+   return typeof js !== 'object' || js === null ? js :
+     Array.isArray(js) ?
+       fromJSArray(im.Seq(js).map(fromJSCustom1), key) :
+       im.Seq(js).map(fromJSCustom1).toMap();
+};
+
 module.exports = {
     newFlight: newFlight,
     newEvent: newEvent,
@@ -66,7 +89,8 @@ module.exports = {
     getEventsFromDB: getEventsFromDB,
     resetDB: resetDB,
     removePlayerFromEvent: removePlayerFromEvent,
-    removeEventFromDB: removeEventFromDB
+    removeEventFromDB: removeEventFromDB,
+    fromJSCustom: fromJSCustom
 };
 
 

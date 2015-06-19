@@ -1,5 +1,5 @@
 im = require('immutable');
-store = require('../src/js/stores/store.js');
+store = require('../src/js/stores/eventStore.js');
 
 // global immutables used over many tests
     var flight1 = store.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
@@ -62,4 +62,11 @@ describe("A player", function() {
         store.removePlayerFromEvent(0, "Sally")
         expect(utils.inTeeList(store.getEventsFromDB().get(0), "Sally")).toBeFalsy();
     })
+});
+
+describe("JSON Conversion - fromJSCustom", function() {
+   it("can convert structures dumped from the internal data format (round trip)", function() {
+       var events = store.getEventsFromDB();
+      expect(store.fromJSCustom(events.toJS()) === events)
+   })
 });

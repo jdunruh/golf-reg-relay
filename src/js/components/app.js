@@ -2,7 +2,7 @@
  * Created by jdunruh on 6/10/15.
  */
 
-var utils = require('./../utils');
+var utils = require('../common/utils');
 var React = require('react');
 
 var db = [{time: "10:36", position: 0, players:["Joe", "Billy Bob", "Spike", "Karen"], maxPlayers: 4},

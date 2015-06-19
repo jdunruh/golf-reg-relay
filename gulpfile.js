@@ -18,7 +18,7 @@ var path = {
     DEST: './index.html',
     DEST_BUILD: './js',
     DEST_SRC: './js',
-    ENTRY_POINT: './src/js/client/app.js',
+    ENTRY_POINT: './src/js/components/app.js',
     CLIENT_JS: ['scr/js/client/**', 'src/js/common/**', 'src/js/components/**', 'src/js/dispatchers/**', 'src/js/stores/**'],
     CLIENT_JASMINE: ['src/js/client/**', 'src/js/common/**', 'src/js/dispatchers/**', 'src/js/stores/**'],
     SERVER_JS: ['scr/js/server/**', 'src/js/common/**'],
