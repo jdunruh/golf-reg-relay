@@ -11,6 +11,12 @@ eventStore.resetDB();
 eventStore.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 
 var TimeSelector = React.createClass({
+    getInitialState: function() {
+        return { timeSelect: "0"}
+    },
+    handleSelectChange: function(e) {
+        this.setState({timeSelect: e.target.value})
+    },
     render: function () {
         var selectList = this.props.event.get("flights").map(function (el, index) {
             return ( <option key={index} value={index}>{el.get("time")}</option>)
@@ -18,7 +24,7 @@ var TimeSelector = React.createClass({
         var buttonLabel = utils.inTeeList(this.props.event, this.props.player) ? "Cancel My Time" : "Add Me";
         return ( <form>
             <label>Time</label>
-            <select name="time">
+            <select name="time" value={ this.state.timeSelect } onChange={this.handleSelectChange}>
                 { selectList }
             </select>
             <button> { buttonLabel } </button>
@@ -55,7 +61,6 @@ var TeeTimeList = React.createClass({
 
 var TeeTimeTable = React.createClass({
     getInitialState: function() {
-        console.log(eventStore.getEventsFromDB());
         return {
             events: eventStore.getEventsFromDB()
         };
