@@ -5,7 +5,7 @@ var eventStore = require('../stores/eventStore');
 var actions = require('../actions/eventActions');
 
 var flight1 = eventStore.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
-var flight2 = eventStore.newFlight(2, "1026", im.Set(["Tommy", "Annie"]));
+var flight2 = eventStore.newFlight(2, "10:26", im.Set(["Tommy", "Annie"]));
 var flight3 = eventStore.newFlight(4, "10:32", im.Set([]));
 eventStore.resetStore();
 eventStore.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
@@ -31,9 +31,12 @@ var TimeSelector = React.createClass({
             utils.availableFlights(this.props.event.get("flights")).count() === 0) {
             selectTag = null;
         } else {
-            var selectList = this.props.event.get("flights").map(function (el, index) {
-                return ( <option key={index} value={index}>{el.get("time")}</option>)
-            });
+            var selectList = this.props.event.get("flights").reduce(function (acc, el, index) {
+                if(!utils.flightFull(el))
+                     return acc.push( <option key={index} value={index}>{el.get("time")}</option>);
+                else
+                    return acc;
+            }, im.List.of());
             var selectTag = <select name="time" value={ this.state.timeSelect }
                                     onChange={this.handleSelectChange}> { selectList } </select>;
         }
@@ -58,7 +61,7 @@ var TeeTime = React.createClass({
             <table className="tee-time">
                 <tbody>
                 <tr>
-                    <td>{ this.props.timeData.get("time") }</td>
+                    <td>{ this.props.timeData.get("time") + " maximum players " +this.props.timeData.get("maxPlayers") }</td>
                 </tr>
                 { players }
                 </tbody>
