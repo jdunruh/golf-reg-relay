@@ -21,6 +21,7 @@ var TimeSelector = React.createClass({
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function(e) {
+        e.preventDefault();
         actions.removePlayer({event: 0, player: this.props.player});
     },
     handleAdd: function() {
@@ -48,10 +49,12 @@ var TeeTime = React.createClass({
         });
         return (
         <table className="tee-time">
+            <tbody>
         <tr>
             <td>{ this.props.timeData.get("time") }</td>
         </tr>
             { players }
+            </tbody>
         </table>)
     }
 });
