@@ -7,8 +7,8 @@ store = require('../src/js/stores/eventStore.js');
     var flight3 = store.newFlight(4, "10:32", im.Set([]));
 
 beforeEach(function() {
-    store.resetDB();
-    store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
+    store.resetStore();
+    store.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 });
 
 describe("A Flight", function() {
@@ -28,45 +28,45 @@ describe("An Event", function() {
        expect(event.get("flights")).toEqual(im.List.of(flight1, flight2, flight3))
    });
 
-    it("Can be added to the DB and then retrieved", function() {
-        expect(store.getEventsFromDB().size).toEqual(1);
+    it("Can be added to the Store and then retrieved", function() {
+        expect(store.getEventsFromStore().size).toEqual(1);
     });
 
     it("can be removed", function() {
-        store.removeEventFromDB(0);
-        expect(store.getEventsFromDB().size).toEqual(0);
+        store.removeEventFromStore(0);
+        expect(store.getEventsFromStore().size).toEqual(0);
     })
 });
 
 describe("A player", function() {
-    store.resetDB();
-    store.addEventToDB("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
+    store.resetStore();
+    store.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 
     it("can be added to a flight", function() {
         store.addPlayerToFlight(0, 0, "Karen");
-        expect(store.getEventsFromDB().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
     });
 
     it("cannot be added a second time", function() {
         store.addPlayerToFlight(0, 0, "Karen");
-        expect(store.getEventsFromDB().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
-        expect(store.getEventsFromDB().getIn([0, "flights", 0, "players"]).filter(x => x === "Karen").size).toEqual(1);
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).filter(x => x === "Karen").size).toEqual(1);
     });
 
     it("cannot be added to a full flight", function() {
         store.addPlayerToFlight(0, 1, "Karen");
-        expect(store.getEventsFromDB().getIn([0, "flights", 1, "players"]).includes("Karen")).toBeFalsy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes("Karen")).toBeFalsy();
     });
 
     it("can be removed from the event", function() {
         store.removePlayerFromEvent(0, "Sally")
-        expect(utils.inTeeList(store.getEventsFromDB().get(0), "Sally")).toBeFalsy();
+        expect(utils.inTeeList(store.getEventsFromStore().get(0), "Sally")).toBeFalsy();
     })
 });
 
 describe("JSON Conversion - fromJSCustom", function() {
    it("can convert structures dumped from the internal data format (round trip)", function() {
-       var events = store.getEventsFromDB();
+       var events = store.getEventsFromStore();
       expect(store.fromJSCustom(events.toJS()) === events)
    })
 });
