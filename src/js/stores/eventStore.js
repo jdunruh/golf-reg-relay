@@ -107,6 +107,7 @@ AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
         case appConstants.ADD_PLAYER:
+            addPlayerToFlight(action.data.event, action.data.flight, action.data.player)
             eventStore.emit(appConstants.CHANGE_EVENT);
             break;
         case appConstants.REMOVE_PLAYER:

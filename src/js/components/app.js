@@ -22,20 +22,26 @@ var TimeSelector = React.createClass({
         e.preventDefault();
         actions.removePlayer({event: 0, player: this.props.player});
     },
-    handleAdd: function () {
-        actions.addPlayer(this.props.player)
+    handleAdd: function (e) {
+        e.preventDefault();
+        actions.addPlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
     },
     render: function () {
-        var selectList = this.props.event.get("flights").map(function (el, index) {
-            return ( <option key={index} value={index}>{el.get("time")}</option>)
-        });
+        if (utils.inTeeList(this.props.event, this.props.player) ||
+            utils.availableFlights(this.props.event.get("flights")).count() === 0) {
+            selectTag = null;
+        } else {
+            var selectList = this.props.event.get("flights").map(function (el, index) {
+                return ( <option key={index} value={index}>{el.get("time")}</option>)
+            });
+            var selectTag = <select name="time" value={ this.state.timeSelect }
+                                    onChange={this.handleSelectChange}> { selectList } </select>;
+        }
         var buttonInfo = utils.inTeeList(this.props.event, this.props.player) ?
         {label: "Cancel My Time", function: this.handleRemove} : {label: "Add Me", function: this.handleAdd};
         return ( <form>
             <label>Time</label>
-            <select name="time" value={ this.state.timeSelect } onChange={this.handleSelectChange}>
-                { selectList }
-            </select>
+            {selectTag}
             <button onClick={buttonInfo.function}> { buttonInfo.label } </button>
         </form>);
     }
