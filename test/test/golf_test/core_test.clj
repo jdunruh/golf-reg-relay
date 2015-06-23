@@ -26,10 +26,13 @@
 (deftest headers
          (testing "time input exists"
                   (to site-url)
-                  (is (exists? {:tag :label :text "Time"})))
+                  (is (exists? {:tag :option :text "10:32"})))
          (testing "has add button"
                   (to site-url)
-                  (is (exists? {:text "Add Me"}))))
+                  (is (exists? {:tag :button :text "Move Me To"})))
+         (testing "has cancel button")
+                  (to site-url)
+                  (is (exists? {:tag :button :text "Cancel My Time"})))
 
 (deftest time-table-rendered
          (testing "correct number of entries"
@@ -37,6 +40,6 @@
                   (is (= 3 (count (find-elements {:css ".tee-time"}))))
                   (testing "correct number of players in each time"
                            (to site-url)
-                           (is (= 6 (count (find-elements {:css ".player"})))))))
+                           (is (= 5 (count (find-elements {:css ".player"})))))))
 
 
