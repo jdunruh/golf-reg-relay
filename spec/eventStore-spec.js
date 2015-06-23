@@ -61,7 +61,16 @@ describe("A player", function() {
     it("can be removed from the event", function() {
         store.removePlayerFromEvent(0, "Sally")
         expect(utils.inTeeList(store.getEventsFromStore().get(0), "Sally")).toBeFalsy();
-    })
+    });
+    it("can be moved to a different flight if it isn't full", function() {
+        store.movePlayerToFlight(0, "Harry", 2);
+        expect(store.getEventsFromStore().getIn([0, "flights", 2, "players"]).includes("Harry")).toBeTruthy();
+    });
+    it("cannot be moved to a full flight", function() {
+        store.movePlayerToFlight(0, "Harry", 1);
+        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes("Harry")).toBeFalsy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Harry")).toBeTruthy();
+    });
 });
 
 describe("JSON Conversion - fromJSCustom", function() {

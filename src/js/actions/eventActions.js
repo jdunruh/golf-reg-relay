@@ -13,6 +13,12 @@ var eventActions = {
             actionType: appConstants.REMOVE_PLAYER,
             data: player
         })
+    },
+    movePlayer: function(player) {
+        AppDispatcher.handleAction({
+            actionType: appConstants.MOVE_PLAYER,
+            data: player
+        })
     }
 };
 

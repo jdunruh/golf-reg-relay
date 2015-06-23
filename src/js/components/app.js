@@ -10,10 +10,39 @@ var flight3 = eventStore.newFlight(4, "10:32", im.Set([]));
 eventStore.resetStore();
 eventStore.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 
+var generateSelect = function (event, value, changeFn, player) {
+    if (utils.availableFlights(event.get("flights")).count() === 0) {
+        selectTag = null;
+    } else { // list of options containing only those flights with room for more players
+        var selectList = event.get("flights").reduce(function (acc, el, index) {
+            if (!utils.flightFull(el) && !utils.playerInFlight(el, player))
+                return acc.push(<option key={index} value={index}>{el.get("time")}</option>);
+            else
+                return acc;
+        }, im.List.of());
+        var selectTag = <select name="time" value={ value }
+                                onChange={changeFn}> { selectList } </select>;
+    }
+    return selectTag;
+};
+
+function generateButtons(event, player, addFn, removeFn, moveFn) {
+    if(!utils.inTeeList(event, player)) {                       // not currently in event
+       return <button onClick={addFn}>Add Me At</button>
+    } else {
+        if(utils.availableFlights(event.get("flights")).count() === 0) { // in event, but no place to move
+            return <button onClick={removeFn}>Cancel My Time</button>;
+        } else {                                                        // in event, can move
+            return (<span><button onClick={removeFn}>Cancel My Time</button>
+            <button onClick={moveFn}>Move Me To</button></span>); // span tag required to prevent JSX error
+        }
+    }
+};
+
 
 var TimeSelector = React.createClass({
-    getInitialState: function () {
-        return {timeSelect: "0"}
+    getInitialState: function () { // need position (index) of first possible flight time
+        return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
     handleSelectChange: function (e) {
         this.setState({timeSelect: e.target.value})
@@ -26,26 +55,14 @@ var TimeSelector = React.createClass({
         e.preventDefault();
         actions.addPlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
     },
+    handleMove: function (e) {
+        e.preventDefault();
+        actions.movePlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
+    },
     render: function () {
-        if (utils.inTeeList(this.props.event, this.props.player) ||
-            utils.availableFlights(this.props.event.get("flights")).count() === 0) {
-            selectTag = null;
-        } else {
-            var selectList = this.props.event.get("flights").reduce(function (acc, el, index) {
-                if(!utils.flightFull(el))
-                     return acc.push( <option key={index} value={index}>{el.get("time")}</option>);
-                else
-                    return acc;
-            }, im.List.of());
-            var selectTag = <select name="time" value={ this.state.timeSelect }
-                                    onChange={this.handleSelectChange}> { selectList } </select>;
-        }
-        var buttonInfo = utils.inTeeList(this.props.event, this.props.player) ?
-        {label: "Cancel My Time", function: this.handleRemove} : {label: "Add Me", function: this.handleAdd};
         return ( <form>
-            <label>Time</label>
-            {selectTag}
-            <button onClick={buttonInfo.function}> { buttonInfo.label } </button>
+            {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove)}
+            {generateSelect(this.props.event, this.state.timeSelect, this.handleSelectChange, this.props.player)}
         </form>);
     }
 });

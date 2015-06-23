@@ -83,6 +83,14 @@ var fromJSCustom1 = function(js, key) {
        im.Seq(js).map(fromJSCustom1).toMap();
 };
 
+// move a player from an existing flight to a new flight
+var movePlayerToFlight = function(event, player, flight) {
+    if(!utils.flightFull(store.getIn(["events", 0, "flights", flight]))) {
+        removePlayerFromEvent(event, player);
+        addPlayerToFlight(event, flight, player);
+    }
+};
+
 var eventStore = objectAssign({}, EventEmitter.prototype, {
     addChangeListener: function(cb){
         this.on(appConstants.CHANGE_EVENT, cb);
@@ -99,8 +107,8 @@ var eventStore = objectAssign({}, EventEmitter.prototype, {
     resetStore: resetStore,
     removePlayerFromEvent: removePlayerFromEvent,
     removeEventFromStore: removeEventFromStore,
-    fromJSCustom: fromJSCustom
-
+    fromJSCustom: fromJSCustom,
+    movePlayerToFlight: movePlayerToFlight
 });
 
 AppDispatcher.register(function(payload){
@@ -112,6 +120,10 @@ AppDispatcher.register(function(payload){
             break;
         case appConstants.REMOVE_PLAYER:
             removePlayerFromEvent(action.data.event, action.data.player);
+            eventStore.emit(appConstants.CHANGE_EVENT);
+            break;
+        case appConstants.MOVE_PLAYER:
+            movePlayerToFlight(action.data.event, action.data.player, action.data.flight);
             eventStore.emit(appConstants.CHANGE_EVENT);
             break;
         default:

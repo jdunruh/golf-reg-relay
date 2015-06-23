@@ -54,3 +54,25 @@ describe("flightFull", function () {
         expect(utils.flightFull(db.get(2))).toBe(false);
     });
 });
+
+describe("playerInFlight", function() {
+    var db = im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+        im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 4}),
+        im.Map({time: "10:48", position: 2, players: im.Set([]), maxPlayers: 2}));
+    it("returns true if the player is in the flight", function() {
+         expect(utils.playerInFlight(db.get(0), "Joe")).toBe(true);
+    });
+    it("returns true if the player is in the flight", function() {
+        expect(utils.playerInFlight(db.get(0), "Annie")).toBe(false);
+    });
+});
+
+describe("findTimes", function() {
+    var db = im.Map({flights: im.List.of(im.Map({time: "10:36", position: 0, players: im.Set(["Joe", "Billy Bob", "Spike", "Karen"]), maxPlayers: 4}),
+        im.Map({time: "10:42", position: 1,players: im.Set(["Annie", "Tommy"]), maxPlayers: 4}),
+        im.Map({time: "10:48", position: 2, players: im.Set([]), maxPlayers: 2}))});
+    it("returns the times available not including any the player is already in", function() {
+        expect(utils.findTimes(db, "Annie").getIn([0, "index"])).toEqual(2);
+        expect(utils.findTimes(db, "Annie").getIn([0, "time"])).toEqual("10:48");
+    });
+});
