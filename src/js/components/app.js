@@ -12,23 +12,18 @@ eventStore.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight
 
 var generateSelect = function (event, value, changeFn, player) {
     if (utils.availableFlights(event.get("flights")).count() === 0) {
-        selectTag = null;
+        return null;
     } else { // list of options containing only those flights with room for more players
-        var selectList = event.get("flights").reduce(function (acc, el, index) {
-            if (!utils.flightFull(el) && !utils.playerInFlight(el, player))
-                return acc.push(<option key={index} value={index}>{el.get("time")}</option>);
-            else
-                return acc;
-        }, im.List.of());
-        var selectTag = <select name="time" value={ value }
+        var selectList = utils.findTimes(event, player).map(el =>
+            <option key={el.get("index")} value={el.get("index")}>{el.get("time")}</option>);
+        return <select name="time" value={ value }
                                 onChange={changeFn}> { selectList } </select>;
     }
-    return selectTag;
 };
 
 function generateButtons(event, player, addFn, removeFn, moveFn) {
     if(!utils.inTeeList(event, player)) {                       // not currently in event
-       return <button onClick={addFn}>Add Me At</button>
+       return <span><button onClick={addFn}>Add Me At</button></span>
     } else {
         if(utils.availableFlights(event.get("flights")).count() === 0) { // in event, but no place to move
             return <button onClick={removeFn}>Cancel My Time</button>;
