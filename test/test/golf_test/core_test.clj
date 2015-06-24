@@ -7,6 +7,7 @@
 (defn browser-fixture [test-fn]
       ;; Start up a browser
       (set-driver! {:browser :chrome})
+      (implicit-wait 500)
 
       (def site-url "http://localhost:3000")
       ;; do the testing
@@ -41,5 +42,26 @@
                   (testing "correct number of players in each time"
                            (to site-url)
                            (is (= 5 (count (find-elements {:css ".player"})))))))
+
+(deftest moving-to-new-flight
+         (testing "Move to new flight"
+                  (to site-url)
+                  (select-option {:tag :select} {:text "10:32"})
+                  (click {:tag :button :text "Move Me To"})
+                  (is (= (text {:css "table:nth-of-type(3) tbody tr:nth-of-type(2) td"}) "Harry"))))
+
+(deftest cancel-time
+         (testing "can cancel")
+         (to site-url)
+         (click {:tag :button :text "Cancel My Time"})
+         (is (not= (text {:css "table:first-of-type tbody tr:first-of-type td"}) "Harry")))
+
+(deftest take-time
+         (testing "Move to new flight"
+                  (to site-url)
+                  (select-option {:tag :select} {:text "10:32"})
+                  (click {:tag :button :text "Cancel My Time"})
+                  (click {:tag :button :text "Add Me At"})
+                  (is (= (text {:css "table:nth-of-type(3) tbody tr:nth-of-type(2) td"}) "Harry"))))
 
 
