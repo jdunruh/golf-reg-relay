@@ -4,17 +4,53 @@ var AppDispatcher = require('../dispatchers/AppDispatcher');
 var appConstants = require('../constants/appConstants');
 var objectAssign = require('react/lib/Object.assign');
 var EventEmitter = require('events').EventEmitter;
+var jquery = require('jquery');
 
 
 var store;
 
+// A little syntactic sugar to fill in the second arg needed
+// in the recursive function on the first call for the user
+var fromJSCustom = function(js) {
+    return fromJSCustom1(js, null)
+};
 
+// players are represented as a Set, other JSON arrays represent Lists
+// expects to get JS converted to immutable Seq from fromJNCustom1
+var fromJSArray = function(js, key) {
+    return key === "players" ? js.toSet() : js.toList();
+};
+
+// recursive function to convert JS structure to immutable as
+// in the form needed for this application. The JS structure has
+// the form of JSON converted to JS as the result of an HTTP request.
+var fromJSCustom1 = function(js, key) {
+    return typeof js !== 'object' || js === null ? js :
+        Array.isArray(js) ?
+            fromJSArray(im.Seq(js).map(fromJSCustom1), key) :
+            im.Seq(js).map(fromJSCustom1).toMap();
+};
 
 var resetStore = function() {
     store = new im.Map({organization: "Up the Creek Ski and Rec Club", events: im.List.of()})
 };
 
+var getInitialDataFromServer = function() {
+    jquery.$.ajax({
+        dataType: "json",
+        method: "get",
+        url: "window.location.origin",
+        timeout: 3000
+    }).done(function(data) {
+        store = fromJSCustom(data);
+        eventStore.emit(appConstants.CHANGE_EVENT);
+        }
+    ).fail(function() { alert("Initial Data Pull Failed. Try again later.")})
+};
+
 resetStore();
+
+
 
 var newFlight = function(maxPlayers, time, players) {
         players = players || im.Set([]);
@@ -61,27 +97,6 @@ var removeEventFromStore = function(event) {
         (coll) => coll.take(event).concat(coll.takeLast(coll.size - event - 1)));
 };
 
-// A little syntactic sugar to fill in the second arg needed
-// in the recursive function on the first call for the user
-var fromJSCustom = function(js) {
-    return fromJSCustom1(js, null)
-};
-
-// players are represented as a Set, other JSON arrays represent Lists
-// expects to get JS converted to immutable Seq from fromJNCustom1
-var fromJSArray = function(js, key) {
-    return key === "players" ? js.toSet() : js.toList();
-};
-
-// recursive function to convert JS structure to immutable as
-// in the form needed for this application. The JS structure has
-// the form of JSON converted to JS as the result of an HTTP request.
-var fromJSCustom1 = function(js, key) {
-   return typeof js !== 'object' || js === null ? js :
-     Array.isArray(js) ?
-       fromJSArray(im.Seq(js).map(fromJSCustom1), key) :
-       im.Seq(js).map(fromJSCustom1).toMap();
-};
 
 // move a player from an existing flight to a new flight
 var movePlayerToFlight = function(event, player, flight) {
@@ -108,7 +123,8 @@ var eventStore = objectAssign({}, EventEmitter.prototype, {
     removePlayerFromEvent: removePlayerFromEvent,
     removeEventFromStore: removeEventFromStore,
     fromJSCustom: fromJSCustom,
-    movePlayerToFlight: movePlayerToFlight
+    movePlayerToFlight: movePlayerToFlight,
+    getInitialDataFromServer: getInitialDataFromServer
 });
 
 AppDispatcher.register(function(payload){
