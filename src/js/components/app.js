@@ -4,11 +4,13 @@ var React = require('react');
 var eventStore = require('../stores/eventStore');
 var actions = require('../actions/eventActions');
 
+/*
 var flight1 = eventStore.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
 var flight2 = eventStore.newFlight(2, "10:26", im.Set(["Tommy", "Annie"]));
 var flight3 = eventStore.newFlight(4, "10:32", im.Set([]));
 eventStore.resetStore();
 eventStore.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
+*/
 
 var generateSelect = function (event, value, changeFn, player) {
     if (utils.availableFlights(event.get("flights")).count() === 0) {
@@ -118,9 +120,13 @@ var TeeTimeTable = React.createClass({
     }
 });
 
-document.addEventListener("DOMContentLoaded", function (event) {
-    React.render(<TeeTimeTable />, document.getElementById('container'));
+document.addEventListener("DOMContentLoaded", function () {
+    eventStore.getInitialDataFromServer(function() {
+        React.render(<TeeTimeTable />, document.getElementById('container'));
+    });
 });
+
+
 
 
 

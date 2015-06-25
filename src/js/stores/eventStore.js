@@ -4,7 +4,7 @@ var AppDispatcher = require('../dispatchers/AppDispatcher');
 var appConstants = require('../constants/appConstants');
 var objectAssign = require('react/lib/Object.assign');
 var EventEmitter = require('events').EventEmitter;
-var jquery = require('jquery');
+var $ = require('jquery');
 
 
 var store;
@@ -35,20 +35,20 @@ var resetStore = function() {
     store = new im.Map({organization: "Up the Creek Ski and Rec Club", events: im.List.of()})
 };
 
-var getInitialDataFromServer = function() {
-    jquery.$.ajax({
+var getInitialDataFromServer = function (cb) {
+    $.ajax({
         dataType: "json",
         method: "get",
-        url: "window.location.origin",
+        url: window.location.origin + "/api/getAllEvents",
         timeout: 3000
-    }).done(function(data) {
-        store = fromJSCustom(data);
-        eventStore.emit(appConstants.CHANGE_EVENT);
+    }).done(function (data) {
+            store = new im.Map({organization: "Up the Creek Ski and Rec Club", events: fromJSCustom(data)});
+            cb();
         }
-    ).fail(function() { alert("Initial Data Pull Failed. Try again later.")})
+    ).fail(function () {
+            alert("Initial Data Pull Failed. Try again later.")
+        })
 };
-
-resetStore();
 
 
 
