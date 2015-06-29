@@ -72,8 +72,8 @@ app.use(function (err, req, res, next) {
 //var mongooseUri = uriUtil.formatMongoose(mongodbUri);
 mongoose.connect(mongoURI + '/golf-reg');
 
-console.log("connecting to " + mongoURI + "/golf-reg");
-console.log(mongooseUri);
+//console.log("connecting to " + mongoURI + "/golf-reg");
+//console.log(mongooseUri);
 
 
 
