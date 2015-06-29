@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var uriUtil = require('mongodb-uri');
 var schema = mongoose.schema;
 var session = require('express-session')
 var nodemailer = require('nodemailer');
@@ -68,7 +69,11 @@ app.use(function (err, req, res, next) {
     });
 });
 
+//var mongooseUri = uriUtil.formatMongoose(mongodbUri);
 mongoose.connect(mongoURI + '/golf-reg');
+
+console.log("connecting to " + mongoURI + "/golf-reg");
+console.log(mongooseUri);
 
 
 

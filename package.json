@@ -4,7 +4,8 @@
   "description": "Golf Tee Time registration for private groups",
   "main": "register.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine",
+    "start": "node --harmony bin/www"
   },
   "author": "John Unruh",
   "license": "Proprietary",
