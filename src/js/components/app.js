@@ -41,6 +41,9 @@ var TimeSelector = React.createClass({
     getInitialState: function () { // need position (index) of first possible flight time
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
+    componentWillReceiveProps: function(nextProps) {
+        this.setState({timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])})
+    },
     handleSelectChange: function (e) {
         this.setState({timeSelect: e.target.value})
     },

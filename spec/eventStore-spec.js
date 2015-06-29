@@ -59,7 +59,7 @@ describe("A player", function() {
     });
 
     it("can be removed from the event", function() {
-        store.removePlayerFromEvent(0, "Sally")
+        store.removePlayerFromEvent(0, "Sally");
         expect(utils.inTeeList(store.getEventsFromStore().get(0), "Sally")).toBeFalsy();
     });
     it("can be moved to a different flight if it isn't full", function() {

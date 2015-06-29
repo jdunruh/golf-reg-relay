@@ -74,5 +74,9 @@ describe("findTimes", function() {
     it("returns the times available not including any the player is already in", function() {
         expect(utils.findTimes(db, "Annie").getIn([0, "index"])).toEqual(2);
         expect(utils.findTimes(db, "Annie").getIn([0, "time"])).toEqual("10:48");
+        expect(utils.findTimes(db, "Trevor").getIn([0, "index"])).toEqual(1);
+        expect(utils.findTimes(db, "Trevor").getIn([0, "time"])).toEqual("10:42");
+        expect(utils.findTimes(db, "Trevor").getIn([1, "index"])).toEqual(2);
+        expect(utils.findTimes(db, "Trevor").getIn([1, "time"])).toEqual("10:48");
     });
 });

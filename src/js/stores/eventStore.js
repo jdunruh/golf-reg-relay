@@ -7,7 +7,7 @@ var EventEmitter = require('events').EventEmitter;
 var $ = require('jquery');
 
 
-var store;
+var store = new im.Map({});
 
 // A little syntactic sugar to fill in the second arg needed
 // in the recursive function on the first call for the user
@@ -75,6 +75,22 @@ var addFlightToEvent = function(event, maxPlayers, time, players) {
     store = store.updateIn([events, event, flights], val => val.push(newFilght(maxPlayers, time, players)))
 };
 
+var addPlayer = function(event, flight, player) {
+    $.ajax({
+        dataType: "json",
+        method: "put",
+        url: window.location.origin + "/api/addPlayer",
+        data: JSON.stringify({event: store.getIn(["events", event, "_id"]), flight: flight, player: player}),
+        timeout: 3000
+    }).done(function (data) {
+        addPlayerToFlight(event, flight, player);
+        eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
+    }).fail(function () {
+        alert("Unable to update server. Try again later.")
+    });
+};
+
+
 var addPlayerToFlight =  function (event, flight, newPlayer) {
             if (!utils.flightFull(store.getIn(["events", event, 'flights', flight]))) {
                 store = store.updateIn(["events", event, 'flights', flight, "players"], val => val.add(newPlayer));
@@ -82,13 +98,30 @@ var addPlayerToFlight =  function (event, flight, newPlayer) {
         };
 
 var getEventsFromStore = function() {
-    return store.get("events");
+    return store.get("events", null);
 };
 
 // event is the index in the events list (array) in which tho palyer is to be added
 var removePlayerFromEvent = function(event, player) {
     store.getIn(["events", event, "flights"]).map(x => x.get("players").includes(player))
-        .forEach((el, key) => store = store.updateIn(["events", event, "flights", key, "players"], val => val.remove(player)));
+        .forEach((el, key) => store = store.updateIn(["events", event, "flights", key, "players"], val => val.remove(player)))};
+
+
+
+var removePlayer = function(event, player) {
+    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").includes(player))
+    $.ajax({
+        dataType: "json",
+        method: "delete",
+        url: window.location.origin + "/api/removePlayer",
+        timeout: 3000,
+        data: JSON.stringify({event: store.getIn(["events", event, "_id"]), player: player, flight: flight[0]}),
+    }).done(function (data) {
+        removePlayerFromEvent(event, player);
+        eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here to ensure that the emit is after the server update
+    }).fail(function () {
+        alert("Unable to update server. Try again later.")
+    });
 };
 
 // event is the index in the events list (array) of the event to remove
@@ -97,6 +130,21 @@ var removeEventFromStore = function(event) {
         (coll) => coll.take(event).concat(coll.takeLast(coll.size - event - 1)));
 };
 
+var movePlayer = function(event, player, toFlight) {
+    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").includes(player))
+    $.ajax({
+        dataType: "json",
+        method: "patch",
+        url: window.location.origin + "/api/movePlayer",
+        timeout: 3000,
+        data: JSON.stringify({event: store.getIn(["events", event, "_id"]), player: player, fromFlight: flight[0], toFlight: toFlight}),
+    }).done(function (data) {
+        movePlayerToFlight(event, player, toFlight);
+        eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here to ensure that the emit is after the server update
+    }).fail(function () {
+        alert("Unable to update server. Try again later.")
+    });
+};
 
 // move a player from an existing flight to a new flight
 var movePlayerToFlight = function(event, player, flight) {
@@ -131,16 +179,13 @@ AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
         case appConstants.ADD_PLAYER:
-            addPlayerToFlight(action.data.event, action.data.flight, action.data.player)
-            eventStore.emit(appConstants.CHANGE_EVENT);
+            addPlayer(action.data.event, action.data.flight, action.data.player)
             break;
         case appConstants.REMOVE_PLAYER:
-            removePlayerFromEvent(action.data.event, action.data.player);
-            eventStore.emit(appConstants.CHANGE_EVENT);
+            removePlayer(action.data.event, action.data.player);
             break;
         case appConstants.MOVE_PLAYER:
-            movePlayerToFlight(action.data.event, action.data.player, action.data.flight);
-            eventStore.emit(appConstants.CHANGE_EVENT);
+            movePlayer(action.data.event, action.data.player, action.data.flight);
             break;
         default:
             return true;
