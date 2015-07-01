@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 //var uriUtil = require('mongodb-uri');
 var schema = mongoose.schema;
-var session = require('express-session')
+var session = require('express-session');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -16,6 +16,8 @@ var crypto = require('crypto');
 var routes = require('./routes/index');
 var appAPI = require('./routes/user-api.js');
 var users = require('./routes/users');
+var players = require('./routes/players');
+var expressValidator = require('express-validator');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
 
@@ -29,13 +31,22 @@ app.set('view engine', 'jade');
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(express.static('.'));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(expressValidator({customValidators: {
+    passwordMatch: (password, confirm) => password === confirm
+}}));
+
+//app.use(expressValidator());
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', appAPI);
 app.use('/users', users);
+app.use('/players', players);
 
 
 // catch 404 and forward to error handler

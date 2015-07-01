@@ -1,0 +1,9 @@
+extends ../common/layout
+block title
+   title Edit Player
+block content
+   h1 Edit Player
+   include ./_player-form
+   form(action="/players/id/" method="post")
+      +_player-form(player, errors)
+      input(type="submit")

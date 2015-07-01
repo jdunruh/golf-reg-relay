@@ -19,14 +19,6 @@ var eventSchema = new mongoose.Schema({
     organizations: [ObjectId]
 });
 
-var userSchema = new mongoose.Schema({
-    name: {type: String, trim: true},
-    email: {type: String, lowercase: true, trim: true, required: true, unique: true},
-    password: {type: String, required: true},
-    resetToken: String,
-    resetExpires: Date,
-    organizations: [ObjectId]
-});
 
 var organizationSchema = new mongoose.Schema({
     name: {type: String, required: true, unique: true},

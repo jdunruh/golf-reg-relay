@@ -8,7 +8,7 @@ dist/*
 node_modules
 node_modules/*
 test/.lein*
-test/target/*
+test/target/classes/META-INF/maven/golf-test/golf-test/pom.properties
 golf-reg.iml
 data/db/*
 

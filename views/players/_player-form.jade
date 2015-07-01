@@ -1,0 +1,23 @@
+mixin _player-form
+    if errors.email
+        .error
+           = errors.email.msg
+    label email address
+        input(type="email" name="email" value= player.email)
+    if errors.name
+        .error
+           = errors.name.msg
+    label Name
+        input(type="text" name="name" value= player.name)
+    if errors.registered
+        .error
+           = errors.registered.msg
+    label Registered?
+        input(type="checkbox" name="registered" checked=player.registered ? true : false)
+    if errors.password
+        .error
+           = errors.password.msg
+    label Password
+        input(type="password" name="password")
+    label Confirm Password
+        input(type="password" name="password-confirm")

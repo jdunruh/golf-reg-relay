@@ -1,0 +1,9 @@
+extends ../common/layout
+block title
+    title Add New Player
+block content
+    h1 Add New Player
+    include ./_player-form
+    form(action="/players" method="post")
+      +_player-form(player, errors)
+      input(type="submit")
