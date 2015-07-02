@@ -39,7 +39,6 @@ app.use(expressValidator({customValidators: {
     passwordMatch: (password, confirm) => password === confirm
 }}));
 
-//app.use(expressValidator());
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

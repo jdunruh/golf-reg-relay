@@ -10,15 +10,19 @@ block content
                     td email
                     td Name
                     td Registered?
-                    td Organizations
+                    td
+                    td
+                    td
             tbody
                 each player in players
                     tr
                         td= player.email
                         td= player.name
                         td= player.registered ? "true" : "false"
-                        td= player.user
                         td
-                            each org in player.organizations
-                                = org + " "
+                            a(href = "players/#{player.id}") show
+                        td
+                            a(href="/players/#{player.id}/edit") edit
+                        td
+                            a(href="/players/#{player.id}/delete" class="delete-link") delete
 

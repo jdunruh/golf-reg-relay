@@ -18,3 +18,7 @@ label input {
 .error {
   color: red;
 }
+
+form.delete {
+  display:none;
+}
