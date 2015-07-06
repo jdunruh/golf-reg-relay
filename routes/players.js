@@ -141,15 +141,11 @@ router.post('/:id', function (req, res, next) {
             if (err)
                 res.redirect(302, '/players');
             else {
-                console.log("first player");
-                console.log(player);
                 player.email = submittedEmail;
                 player.name = req.body.name;
                 player.registered = req.body.registered;
                 if (req.body.password.length > 0)
                     player.password = req.body.password;
-                console.log("second player");
-                console.log(player);
                 player.save(function (err, player) {
                     if (err)
                         res.redirect(302, '/players');

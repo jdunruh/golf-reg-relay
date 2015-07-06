@@ -131,7 +131,7 @@ var removeEventFromStore = function(event) {
 };
 
 var movePlayer = function(event, player, toFlight) {
-    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").includes(player))
+    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").includes(player));
     $.ajax({
         dataType: "json",
         method: "patch",

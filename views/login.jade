@@ -1,0 +1,13 @@
+extends common/layout.jade
+
+block title
+   title Golf Registration
+   link(rel="stylesheet" href="/public/stylesheets/login.css")
+
+.container
+   form(class=login-box, action="/login", method="post")
+     label email
+       input(type='text', value='', name='email')
+    label password
+      input(type="password", value="", name="password")
+     a(href="/register")Register

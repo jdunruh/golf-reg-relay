@@ -34,7 +34,7 @@ function generateButtons(event, player, addFn, removeFn, moveFn) {
             <button onClick={moveFn}>Move Me To</button></span>); // span tag required to prevent JSX error
         }
     }
-};
+}
 
 
 var TimeSelector = React.createClass({
@@ -42,9 +42,10 @@ var TimeSelector = React.createClass({
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
     componentWillReceiveProps: function(nextProps) {
-        this.setState({timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])})
+        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
     handleSelectChange: function (e) {
+        console.log("setting timeSelect to " + e.target.value);
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function (e) {

@@ -22,3 +22,7 @@ label input {
 form.delete {
   display:none;
 }
+
+label.checkbox-label {
+  display: inline;
+}

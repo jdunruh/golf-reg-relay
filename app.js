@@ -5,8 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-//var uriUtil = require('mongodb-uri');
-var schema = mongoose.schema;
+    var schema = mongoose.schema;
 var session = require('express-session');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
@@ -17,6 +16,7 @@ var routes = require('./routes/index');
 var appAPI = require('./routes/user-api.js');
 var users = require('./routes/users');
 var players = require('./routes/players');
+var login = require('./routes/login');
 var expressValidator = require('express-validator');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
@@ -43,6 +43,7 @@ app.use(expressValidator({customValidators: {
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/', login);
 app.use('/api', appAPI);
 app.use('/users', users);
 app.use('/players', players);
@@ -79,7 +80,6 @@ app.use(function (err, req, res, next) {
     });
 });
 
-//var mongooseUri = uriUtil.formatMongoose(mongodbUri);
 mongoose.connect(mongoURI + '/golf-reg');
 
 //console.log("connecting to " + mongoURI + "/golf-reg");
