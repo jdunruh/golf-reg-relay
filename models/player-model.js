@@ -1,21 +1,27 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'),
+      bcrypt = require('bcrypt-nodejs')
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 
 var fixPassword = function(player, saltFactor, password, next) {
+    console.log('in password encryption');
     bcrypt.genSalt(saltFactor, function(err, salt) {
-        bcrypt.hash(password, salt, function(err, hash) {
-            if(err)
+        console.log('salted');
+        bcrypt.hash(password, salt, null, function(err, hash) {
+            if(err) {
+                console.log('error in bcrypt');
                 return next(err);
+            }
             else {
                 player.password = hash;
-                console.log("about to call next()");
+                console.log('hashed password, about to call next() hash = ' + hash);
                 return next();
             }
         })
     })
 };
+
 
 playersSchema = new mongoose.Schema({
     name: {type: String, trim: true},
@@ -27,8 +33,9 @@ playersSchema = new mongoose.Schema({
     organizations: [ObjectId]
 });
 
+
 playersSchema.pre('save', function(next) {
-    if(!this.isModified('password'))
+    console.log('about to hash password');
         return fixPassword(this, 10,this.password, next)
 });
 
@@ -37,8 +44,17 @@ playersSchema.pre('update', function(next) {
         return fixPassword(this, 10, this.password, next)
 });
 
+playersSchema.methods.comparePassword = function(candidatePassword) {
+    bcrypt.compare(candidatePassword, this.password, function(err, match, cb) {
+        if(err)
+            return cb(err, null);
+        else
+            return cd(null, match);
+    })
+};
 
 
 module.exports = {
-    Player: mongoose.model('Players', playersSchema)
+   Player: mongoose.model('Players', playersSchema)
 };
+

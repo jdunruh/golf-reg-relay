@@ -2,49 +2,15 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
+var players = require('../models/player-model');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
-var playersSchema = new mongoose.Schema({
-    name: {type: String, trim: true},
-    email: {type: String, lowercase: true, trim: true, required: true, unique: true},
-    password: {type: String, required: true},
-    registered: Boolean,
-    resetToken: String,
-    resetExpires: Date,
-    organizations: [ObjectId]
-});
 
-var fixPassword = function(player, saltFactor, password, next) {
-    bcrypt.genSalt(saltFactor, function(err, salt) {
-        bcrypt.hash(password, salt, function(err, hash) {
-            if(err)
-                return next(err);
-            else {
-                player.password = hash;
-                console.log("about to call next()");
-                return next();
-            }
-        })
-    })
-};
-
-playersSchema.pre('save', function(next) {
-    if(!this.isModified('password'))
-        return fixPassword(this, 10,this.password, next)
-});
-
-playersSchema.pre('update', function(next) {
-    if(!this.isModified('password'))
-        return fixPassword(this, 10, this.password, next)
-});
-
-var Player = mongoose.model('Players', playersSchema);
 
 //index
 router.get('/', function(req, res, next) {
-    Player.find({}, null, { sort: { _id: 1 } }, function(err, docs) {
+    players.Player.find({}, null, { sort: { _id: 1 } }, function(err, docs) {
         if(err) {
             res.status(404).send();
         } else {
@@ -70,33 +36,42 @@ var validateForm = function(req) {
     };
 
 //create
-router.post('/', function(req, res, next) {
+router.post('/', function (req, res, next) {
     req.sanitize('email').normalizeEmail();
     var submittedEmail = req.body.email;
     var mappedErrors = validateForm(req);
-    if(mappedErrors)
-        res.render('players/new.jade', {player: {email: submittedEmail,
-            name: req.body.name,
-            registered: req.body.registered
-        },
-            errors: req.validationErrors(true)});
+    if (mappedErrors) {
+        res.render('players/new.jade', {
+            player: {
+                email: submittedEmail,
+                name: req.body.name,
+                registered: req.body.registered
+            },
+            errors: req.validationErrors(true)
+        });
+    }
     else {
-        player = new Player({
+        player = new players.Player({
             email: submittedEmail,
             password: req.body.password,
             name: req.body.name,
             registered: req.body.registered
         });
-        player.save()
-            .then(res.redirect(302, '/players'))
-            .end(res.render('players/new.jade', {
-                player: {
-                    email: submittedEmail,
-                    name: req.body.name,
-                    registered: req.body.registered
-                },
-                errors: {email: "Unable to save information, try again later"}
-            }));
+        player.save(function (err) {
+            if (err) {
+                res.render('players/new.jade', {
+                    player: {
+                        email: submittedEmail,
+                        name: req.body.name,
+                        registered: req.body.registered
+                    },
+                    errors: {email: {msg: "email address already in system"}}
+                })
+            } else {
+                console.log('success leg');
+                res.redirect(302, '/players');
+            }
+        });
     }
 });
 
@@ -108,16 +83,18 @@ router.get('/new', function(req, res, next) {
         name: "",
         registered: false,
         password: ""},
-    errors: {}});
+    errors: {},
+    referrer: req.get('Referrer')});
 });
 
 //show
 router.get('/:id', function(req, res, next) {
-    Player.findById(req.params.id, function(err, docs) {
+    players.Player.findById(req.params.id, function(err, docs) {
+        console.log(docs);
         if(err) {
             res.status(404).send();
         } else {
-            res.render('players/show.jade', {player: docs, errors:{}});
+            res.render('players/show.jade', {player: docs, errors:{}, referrer: req.get('Referrer')});
         }
     })
 });
@@ -137,7 +114,7 @@ router.post('/:id', function (req, res, next) {
             errors: mappedErrors
         });
     else {
-        Player.findById(req.params.id, function (err, player) {
+        players.Player.findById(req.params.id, function (err, player) {
             if (err)
                 res.redirect(302, '/players');
             else {
@@ -161,11 +138,11 @@ router.post('/:id', function (req, res, next) {
 //edit
 router.get('/:id/edit', function(req, res, next) {
     console.log(req.params.id);
-    Player.findById(req.params.id, function(err, docs) {
+    players.Player.findById(req.params.id, function(err, docs) {
         if(err) {
             res.redirect(302, '/players');
         } else {
-            res.render('players/edit.jade', {player: docs, id: req.params.id, errors: {}});
+            res.render('players/edit.jade', {player: docs, id: req.params.id, errors: {}, referrer: req.get('Referrer')});
         }
     });
 });
@@ -174,7 +151,7 @@ router.get('/:id/edit', function(req, res, next) {
 
 //delete
 router.post('/:id/delete', function(req, res, next) {
-    Player.findByIdAndRemove(req.params.id, function(err, docs) {
+    players.Player.findByIdAndRemove(req.params.id, function(err, docs) {
         if(err) {
             res.status(404).send();
         } else {

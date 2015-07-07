@@ -43,7 +43,7 @@ app.use(expressValidator({customValidators: {
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', login);
+//app.use('/', login);
 app.use('/api', appAPI);
 app.use('/users', users);
 app.use('/players', players);
