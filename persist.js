@@ -7,7 +7,7 @@ var players = require('./models/player-model');
 module.exports = {
     newPlayer: function (inPlayer) { // channel gets player structure with data to save
         var ch = csp.chan();
-        player = new players.Player(inPlayer)
+        player = new players.Player(inPlayer);
         player.save(function (err, docs) {
             if (err)
                 putAsync(channel, err);

@@ -1,3 +1,4 @@
+require('dotenv').load();
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -5,8 +6,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-    var schema = mongoose.schema;
-var session = require('express-session');
+var schema = mongoose.schema;
+var cookieSession = require('cookie-session');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -22,6 +23,9 @@ var expressValidator = require('express-validator');
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
 
 var app = express();
+
+app.set('trust proxy', 1); // trust first proxy
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -41,12 +45,23 @@ app.use(expressValidator({customValidators: {
 
 
 app.use(cookieParser());
+app.use(cookieSession({
+    name: 'session',
+    keys: [process.env.SESSION_KEY_1, process.env.SESSION_KEY_2, process.env.SESSION_KEY_3, process.env.SESSION_KEY_4],
+    signed: true,
+    secureProxy: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('/', login);
 app.use('/api', appAPI);
 app.use('/users', users);
 app.use('/players', players);
+app.use('/', login);
 
 
 // catch 404 and forward to error handler

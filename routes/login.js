@@ -1,35 +1,41 @@
 
 var express = require('express');
 var passport = require('passport');
-var localStrategy = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 var router = express.Router();
 var persist = require('../persist');
 var csp = require('js-csp');
+var players = require('../models/player-model');
 
-passport.use(new localStrategy({
-        usernameField: 'email'
-    },
+passport.serializeUser(function(user, done) {
+    done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
+});
+
+passport.use(new LocalStrategy(
     function(username, password, done) {
-        player = csp.take(persist.getPlayerByEmail(username));
-            if (!player) {
-                return done(null, false, { message: 'Incorrect email/password.' });
+    players.Player.findOne({ email: username }, function(err, player) {
+        if (err) return done(err);
+        if (!player) return done(null, false, { message: 'Incorrect email/password combination.' });
+        player.comparePassword(password, function(err, isMatch) {
+            if (isMatch) {
+                return done(null, player);
+            } else {
+                return done(null, false, { message: 'Incorrect email//password.' });
             }
-            player.comparePassword(password, function() {
-                if (err)
-                    return done(null, false, {message: 'Incorrect email/password.'});
-                else
-                    return done(null, player);
-            });
-    }));
-
+        });
+    });
+}));
 
 
 
 const loginForm = function(req, res, next) {
      res.render('login.jade');
-    },
-    loginSubmission = function(req, res, next) {
-
     },
     resetForm = function(req, res, next) {
         res.render('reset.jade');
@@ -42,11 +48,15 @@ const loginForm = function(req, res, next) {
 router.get('/login', loginForm);
 
 // login
-router.post('/login',
-    passport.authenticate('local', { failureRedirect: '/login' }),
-    function(req, res) {
-        res.redirect('/');
-    });
+router.post('/login', passport.authenticate('local', {successRedirect: '/',
+    failureRedirect: '/login'}));
+
+// logout
+router.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/login');
+});
+
 // password reset form
 router.get('/reset/:token', resetForm);
 

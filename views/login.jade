@@ -4,10 +4,11 @@ block title
    title Golf Registration
    link(rel="stylesheet" href="/public/stylesheets/login.css")
 
-.container
+block content
    form(class=login-box, action="/login", method="post")
-     label email
-       input(type='text', value='', name='email')
-    label password
-      input(type="password", value="", name="password")
-     a(href="/register")Register
+        label email
+            input(type='text', placeholder="mail@example.com", name='username')
+        label password
+            input(type="password", name="password")
+        input(type="submit")
+    a(href="/register") Register

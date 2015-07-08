@@ -11,6 +11,7 @@ test/.lein*
 test/target/classes/META-INF/maven/golf-test/golf-test/pom.properties
 golf-reg.iml
 data/db/*
+.env
 
 
 

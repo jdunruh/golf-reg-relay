@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'),
-      bcrypt = require('bcrypt-nodejs')
+      bcrypt = require('bcrypt-nodejs');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -44,14 +44,16 @@ playersSchema.pre('update', function(next) {
         return fixPassword(this, 10, this.password, next)
 });
 
-playersSchema.methods.comparePassword = function(candidatePassword) {
-    bcrypt.compare(candidatePassword, this.password, function(err, match, cb) {
+playersSchema.methods.comparePassword = function(candidatePassword, cb) {
+    console.log('in comparePassord this.password = ' + this.password + 'candidatePassword = ' + candidatePassword);
+    bcrypt.compare(candidatePassword, this.password, function(err, match) {
         if(err)
             return cb(err, null);
         else
-            return cd(null, match);
+            return cb(null, match);
     })
 };
+
 
 
 module.exports = {
