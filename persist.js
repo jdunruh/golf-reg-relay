@@ -4,70 +4,100 @@ var bcrypt = require('bcrypt');
 var csp = require('js-csp');
 var players = require('./models/player-model');
 
+var ObjectId = mongoose.Schema.Types.ObjectId;
+
+
 module.exports = {
-    newPlayer: function (inPlayer) { // channel gets player structure with data to save
+    newPlayer: function (model, input) { // channel gets player structure with data to save
         var ch = csp.chan();
-        player = new players.Player(inPlayer);
-        player.save(function (err, docs) {
+        var myModel = new model(input);
+        myModel.save(function (err, docs) {
             if (err)
-                putAsync(channel, err);
+                csp.putAsync(channel, err);
             else
-                putAsync(channel, docs);
+                csp.putAsync(channel, docs);
         });
         return ch;
     },
-    updatePlayer: function (inPlayer) { // channel gets player structure with _id and any fields to update
-        var ch = chan();
-        players.Player.findById(sentPlayer.id).exec()
-            .then(function (player) {
-                for (var p in inPlayer)
-                    player[p] = inPlayer[p];
-                player.save.exec();
+    updatePlayer: function (model, input) { // channel gets player structure with _id and any fields to update
+        console.log(input);
+        console.log("object id is " + input._id);
+        var ch = csp.chan();
+        model.findById(input._id, function(err, doc) {
+            console.log(doc);
+            if (err)
+                csp.putAsync(err);
+            else
+                for (var p in input)
+                    doc[p] = input[p];
+            return doc.save(function (err, val) {
+                if (err)
+                    csp.putAsync(ch, err);
+                else
+                    csp.putAsync(ch, val);
             })
-            .then(function (doc) {
-                putAsync(channel, doc);
-            })
-            .onReject(function (err) {
-                putAsync(channel, err);
-            })
-            .end();
+        });
         return ch;
     },
-    removePlayer: function(channel) { // channel gets player _id
-        var player = takeAsync(channel);
-        players.Player.findByIdAndRemove(player, function (err, docs) {
-            if (err) {
-                putAsync(channel, err);
-            } else {
-                putAsync(channel, docs);
-            }
-        })
-    },
-    getPlayerById: function(channel) { // channel gets _id of player
-        var player = takeAsync(channel);
-        players.Player.findById(player, function(err,docs) {
-            if(err)
-                putAsync(channel, err);
-            else
-                putAsync(channel, docs);
-        })
-    },
-    getPlayerByEmail: function(channel) { // channel gets email of player
-        var email = takeAsync(channel);
-        players.Player.find({email: email}, function(err, docs) {
-          if(err)
-            putAsync(channel, err);
-          else
-            putAsync(chonnel, docs);
-        })
-    },
-    getAllPlayers: function() { // get all players
+    removePlayer: function(model, id) { // channel gets player _id
         var ch = csp.chan();
-        players.Player.find({}, function(err, docs) {
+        model.findByIdAndRemove(id, function (err, docs) {
+            if (err) {
+                csp.putAsync(ch, err);
+            } else {
+                csp.putAsync(ch, docs);
+            }
+        });
+        return ch;
+    },
+    getPlayerById: function(model, id) { // channel gets _id of player
+        var ch = csp.chan();
+        model.findById(player, function(err,docs) {
             if(err)
-                putAsync(ch, err);
+                csp.putAsync(channel, err);
             else
-                putAsync(ch, docs)
+                csp.putAsync(channel, docs);
+        });
+        return ch;
+    },
+    getPlayerByEmail: function(model, email) { // channel gets email of player
+        var ch = csp.chan();
+        model.find({email: email}, function(err, docs) {
+          if(err)
+            csp.putAsync(ch, err);
+          else
+            csp.putAsync(ch, docs);
+        });
+        return ch;
+    },
+    getAllPlayers: function(model) { // get all players
+        var ch = csp.chan();
+        model.find({}, function(err, docs) {
+            if(err)
+                csp.putAsync(ch, err);
+            else
+                csp.putAsync(ch, docs)
+        });
+        return ch;
+    },
+    getPlayerByToken: function(model,token) {
+        var ch = csp.chan();
+        model.find({resetToken: token}, function(err, docs) {
+            if(err)
+                csp.putAsync(ch, err);
+            else
+                csp.putAsync(ch, docs)
+        });
+        return ch;
+    },
+    savePlayer: function(player) {
+        console.log(player);
+        var ch = csp.chan();
+        player.save(function(err, result) {
+            if(err)
+                csp.putAsync(ch, err);
+            else
+                csp.putAsync(ch, result);
         });
         return ch;
     }

@@ -12,7 +12,7 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
             expect(data.email).toEqual(player.email);
             expect(data.name).toEqual(player.name);
             expect(data.registered).toBe(true);
@@ -20,7 +20,7 @@ describe("player", function() {
             expect(data.password).not.toEqual(player.password);
             expect(data.password.length).toBeGreaterThan(player.password.length);
             expect(data._id).not.toBe(null);
-            players.Player.remove({_id: data.id});
+            players.Player.remove(players.Player, data._id);
         });
     });
 
@@ -33,12 +33,12 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
             data.name = "Yogi Bear";
             var data1 = yield csp.take(persist.updatePlayer(data));
             expect(data1.name).toEqual("Yogi Bear");
             expect(data.password).toEqual(data1.password);
-            players.Player.remove({_id: data1.id});
+            players.Player.remove(players.Player, data1._id);
         })
     });
 
@@ -51,12 +51,12 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
             data.password = "Oh what a relief it is";
-            var data1 = yield csp.take(persist.updatePlayer(data));
+            var data1 = yield csp.take(players.Player, persist.updatePlayer(players.Player, data));
             expect(data1.name).toEqual("Yogi Bear");
             expect(data.password).not.toEqual(data1.password);
-            players.Player.remove({_id: data1.id});
+            players.Player.remove(players.Player, data1._id);
         })
     });
 
@@ -69,12 +69,12 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
-            yield csp.take(persist.removePlayer(data._id));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
+            yield csp.take(persist.removePlayer(players.Player, data._id));
             players.Player.findById(data._id, function(err, player) {
                 expect(player).toEqual({});
             });
-            players.Player.remove({_id: data.id});
+            players.Player.remove(players.Player, data.id);
         })
     });
 
@@ -87,13 +87,13 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
-            var data1 = yield csp.take(persist.getPlayerById((data._id)));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
+            var data1 = yield csp.take(persist.getPlayerById(players.Player, data._id));
             expect(data.email).toEqual(data1.email);
             expect(data.name).toEqual(data1.name);
             expect(data._id).toEqual(data1._id);
             expect(data.password).toEqual(data1.password);
-            players.Player.remove({_id: data1.id});
+            players.Player.remove(players.Player, data1.id);
         });
     });
 
@@ -106,13 +106,13 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            data = yield csp.take(persist.newPlayer(player));
-            var data1 = yield csp.take(persist.getPlayerByEmail((data.eamil)));
+            data = yield csp.take(persist.newPlayer(players.Player, player));
+            var data1 = yield csp.take(persist.getPlayerByEmail(players.Player, (data.eamil)));
             expect(data.email).toEqual(data1.email);
             expect(data.name).toEqual(data1.name);
             expect(data._id).toEqual(data1._id);
             expect(data.password).toEqual(data1.password);
-            players.Player.remove({_id: data1.id});
+            players.Player.remove(players.Player, data1.id);
         });
     });
 
@@ -125,13 +125,13 @@ describe("player", function() {
         };
         var data = {};
         csp.go(function*() {
-            count = yield csp.take(persist.getAllPlayers()).count;
-            data = yield csp.take(persist.newPlayer(player));
-            data1 = yield csp.take(persist.newPlayer(player));
-            count1 = yield csp.take(persist.getAllPlayers()).count;
+            count = yield csp.take(persist.getAllPlayers(players.Player)).count;
+            data = yield csp.take(persist.newPlayer(players.Player, player));
+            data1 = yield csp.take(persist.newPlayer(players.Player, player));
+            count1 = yield csp.take(persist.getAllPlayers(players.Player)).count;
             expect(count1 - count).toEqual(2);
-            players.Player.remove({_id: data.id});
-            players.Player.remove({_id: data1.id});
+            players.Player.remove(players.Player, data.id);
+            players.Player.remove(players.Player, data1.id);
         });
     });
 

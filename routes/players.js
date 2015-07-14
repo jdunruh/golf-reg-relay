@@ -68,7 +68,6 @@ router.post('/', function (req, res, next) {
                     errors: {email: {msg: "email address already in system"}}
                 })
             } else {
-                console.log('success leg');
                 res.redirect(302, '/players');
             }
         });

@@ -1,0 +1,22 @@
+extends common/layout.jade
+block title
+    title Golf Registration
+    link(rel="stylesheet" href="/public/stylesheets/login.css")
+block content
+    form(class=login - box, action="/doreset/#{token}", method="post")
+        if errors.email
+            .error
+                = errors.email.msg
+        label email
+            input(type='email', placeholder="mail@example.com", name='email')
+        if errors.password
+            .error
+                = errors.password.msg
+        label new password
+            input(type="password", name="password")
+        if errors.password-confirm
+            .error
+                = errors.password-confirm.msg
+        label confirm password
+          input(type="password", name="password-confirm")
+        button(type="submit") Reset Password
