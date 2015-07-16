@@ -2,13 +2,11 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var csp = require('js-csp');
-var players = require('./models/player-model');
-
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 
 module.exports = {
-    newPlayer: function (model, input) { // channel gets player structure with data to save
+    newModel: function (model, input) { // channel gets player structure with data to save
         var ch = csp.chan();
         var myModel = new model(input);
         myModel.save(function (err, docs) {
@@ -19,7 +17,7 @@ module.exports = {
         });
         return ch;
     },
-    updatePlayer: function (model, input) { // channel gets player structure with _id and any fields to update
+    updateModel: function (model, input) { // channel gets player structure with _id and any fields to update
         console.log(input);
         console.log("object id is " + input._id);
         var ch = csp.chan();
@@ -39,7 +37,7 @@ module.exports = {
         });
         return ch;
     },
-    removePlayer: function(model, id) { // channel gets player _id
+    removeModel: function(model, id) { // channel gets player _id
         var ch = csp.chan();
         model.findByIdAndRemove(id, function (err, docs) {
             if (err) {
@@ -50,7 +48,7 @@ module.exports = {
         });
         return ch;
     },
-    getPlayerById: function(model, id) { // channel gets _id of player
+    getModelById: function(model, id) { // channel gets _id of player
         var ch = csp.chan();
         model.findById(player, function(err,docs) {
             if(err)
@@ -70,7 +68,7 @@ module.exports = {
         });
         return ch;
     },
-    getAllPlayers: function(model) { // get all players
+    getAll: function(model) { // get all players
         var ch = csp.chan();
         model.find({}, function(err, docs) {
             if(err)
@@ -90,7 +88,7 @@ module.exports = {
         });
         return ch;
     },
-    savePlayer: function(player) {
+    saveModel: function(player) {
         console.log(player);
         var ch = csp.chan();
         player.save(function(err, result) {

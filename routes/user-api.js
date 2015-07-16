@@ -7,25 +7,9 @@ var mongoose = require('mongoose');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 
-
-/* GET users listing. */
-var eventSchema = new mongoose.Schema({
-    date: {type: String, required: true},
-    location: {type: String, required: true, trim: true},
-    flights: [{time: {type: String, required: true},
-        maxPlayers: {type: Number, required: true},
-        players:[ String ]
-    }],
-    organizations: [ObjectId]
-});
+var events = require('../models/event-model');
 
 
-var organizationSchema = new mongoose.Schema({
-    name: {type: String, required: true, unique: true},
-    organizers: [ObjectId]
-});
-
-var Event = mongoose.model('Event', eventSchema);
 
 // seed database for testing purposes
 var eventTestData = {
@@ -37,15 +21,15 @@ var eventTestData = {
         {maxPlayers: 4, time: "10:32", players: []}]
 };
 
-var event = new Event(eventTestData);
+var event = new events.Event(eventTestData);
 
-Event.remove({}, function(err, result) {
+events.Event.remove({}, function(err, result) {
     event.save();
 });
 
 
 router.get('/getAllEVents', function(req, res, next) {
-    Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) {
+    events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) {
         if(err) {
             res.status(404).json(err);
         } else {
@@ -54,10 +38,10 @@ router.get('/getAllEVents', function(req, res, next) {
     })
 });
 
-router.delete('/removePlayer/', function(req, res, next) {
+router.delete('/removeModel/', function(req, res, next) {
     var update = {$pull: {}}; // need to validate that the flight is legal
     update['$pull']["flights." + req.body.flight + ".players"] = req.body.player;
-    Event.update({_id: req.body.event}, update, function(err, docs) {
+    events.Event.update({_id: req.body.event}, update, function(err, docs) {
         if(err) {
             res.status(500).json(err);
         } else {
@@ -69,7 +53,7 @@ router.delete('/removePlayer/', function(req, res, next) {
 router.put('/addPlayer/', function(req, res, next) {
     var update = {$addToSet: {}}; // need to validate that the flight is legal
     update['$addToSet']["flights." + req.body.flight + ".players"] = req.body.player;
-    Event.update({_id: req.body.event}, update, function(err, docs) {
+    events.Event.update({_id: req.body.event}, update, function(err, docs) {
         if(err) {
             res.status(500).json(err);
         } else {
@@ -81,13 +65,13 @@ router.put('/addPlayer/', function(req, res, next) {
 router.patch('/movePlayer/', function(req, res, next) {
     var update = {$pull: {}}; // need to validate that the flight is legal
     update['$pull']["flights." + req.body.fromFlight + ".players"] = req.body.player;
-    Event.update({_id: req.body.event}, update, function(err, docs) {
+    events.Event.update({_id: req.body.event}, update, function(err, docs) {
         if(err) {
             res.status(500).json(err);
         } else {
             update = {$addToSet: {}}; // need to validate that the flight is legal
             update['$addToSet']["flights." + req.body.toFlight + ".players"] = req.body.player;
-            Event.update({_id: req.body.event}, update, function(err, docs) {
+            events.Event.update({_id: req.body.event}, update, function(err, docs) {
                 if(err) {
                     res.status(500).json(err);
                 } else {

@@ -113,7 +113,7 @@ var removePlayer = function(event, player) {
     $.ajax({
         dataType: "json",
         method: "delete",
-        url: window.location.origin + "/api/removePlayer",
+        url: window.location.origin + "/api/removeModel",
         timeout: 3000,
         data: JSON.stringify({event: store.getIn(["events", event, "_id"]), player: player, flight: flight[0]}),
     }).done(function (data) {

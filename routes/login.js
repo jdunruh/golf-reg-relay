@@ -65,7 +65,7 @@ const loginForm = function(req, res, next) {
             var resetToken = yield csp.take(mailer.generateToken());
             console.log('have reset token');
             console.log('about to update');
-            var result = yield csp.take(persist.updatePlayer(players.Player, {_id: player._id, resetToken: resetToken,
+            var result = yield csp.take(persist.updateModel(players.Player, {_id: player._id, resetToken: resetToken,
                                                                                 resetExpires: (Date.now() + 87000000)})); // 24 hr expiration
             console.log('updated player');
             console.log(result);
@@ -114,7 +114,7 @@ const loginForm = function(req, res, next) {
             player.resetToken = "";
             player.resetExpires = undefined;
             console.log('about to save player');
-            var result = yield csp.take(persist.savePlayer(player));
+            var result = yield csp.take(persist.saveModel(player));
             if (result instanceof Error) { // could not save email
                 console.log(result);
                 next(result);

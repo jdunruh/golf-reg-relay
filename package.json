@@ -2,7 +2,7 @@
   "name": "golf-reg",
   "version": "0.0.1",
   "description": "Golf Tee Time registration for private groups",
-  "main": "register.js",
+  "main": "app.js",
   "scripts": {
     "test": "jasmine",
     "start": "node --harmony bin/www"

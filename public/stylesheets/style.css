@@ -26,3 +26,7 @@ form.delete {
 label.checkbox-label {
   display: inline;
 }
+
+#template {
+  display: none;
+}

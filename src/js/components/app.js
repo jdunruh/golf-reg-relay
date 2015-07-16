@@ -50,7 +50,7 @@ var TimeSelector = React.createClass({
     },
     handleRemove: function (e) {
         e.preventDefault();
-        actions.removePlayer({event: 0, player: this.props.player});
+        actions.removeModel({event: 0, player: this.props.player});
     },
     handleAdd: function (e) {
         e.preventDefault();

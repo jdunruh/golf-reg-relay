@@ -34641,7 +34641,7 @@ var eventActions = {
             data: player
         });
     },
-    removePlayer: function removePlayer(player) {
+    removeModel: function removePlayer(player) {
         AppDispatcher.handleAction({
             actionType: appConstants.REMOVE_PLAYER,
             data: player
@@ -34804,7 +34804,7 @@ var TimeSelector = React.createClass({
     },
     handleRemove: function handleRemove(e) {
         e.preventDefault();
-        actions.removePlayer({ event: 0, player: this.props.player });
+        actions.removeModel({ event: 0, player: this.props.player });
     },
     handleAdd: function handleAdd(e) {
         e.preventDefault();
@@ -35060,7 +35060,7 @@ var removePlayer = function removePlayer(event, player) {
     $.ajax({
         dataType: 'json',
         method: 'delete',
-        url: window.location.origin + '/api/removePlayer',
+        url: window.location.origin + '/api/removeModel',
         timeout: 3000,
         data: JSON.stringify({ event: store.getIn(['events', event, '_id']), player: player, flight: flight[0] })
     }).done(function (data) {

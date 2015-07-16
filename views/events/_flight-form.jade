@@ -1,0 +1,13 @@
+mixin _flight-form(flight, errors, index, newForm)
+   .flight
+      button(class= newForm ? "new-delete-flight" : "edit-delete-flight") Delete
+      if errors.time
+         .error
+            = errors.name.msg
+      label Tee Time
+         input(type="time", name="flights[#{index}][time]", value= flight.time, required)
+      if errors.maxPlayers
+         .error
+            = errors.maxPlayers.msg
+      label Maximum Players
+         input(type="date", name="flights[#{index}][maxPlayers]", value= flight.maxPlayers, required)

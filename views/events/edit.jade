@@ -1,0 +1,20 @@
+extends ../common/layout
+block title
+   title Edit Event
+block content
+   h1 Edit Event
+   include ./_event-form
+   include ./_flight-form
+   form(action="/events/#{id}" method="post")
+      +_event-form(event, errors)
+      .flights
+         each flight, index in event.flights
+            if errors.flights
+               +_flight-form(flight, errors.flights[index], index, false)
+            else
+               +_flight-form(flight, {}, index, false)
+      button(type="submit") Create Event
+      button(class="add-flight") Add Another Time
+   a(href= "#{referrer}") Back
+   #template
+      +_flight-form({}, {}, 0)

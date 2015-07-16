@@ -13,11 +13,11 @@ var nodemailer = require('nodemailer');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
-var routes = require('./routes/index');
 var appAPI = require('./routes/user-api.js');
 var users = require('./routes/users');
 var players = require('./routes/players');
 var login = require('./routes/login');
+var events = require('./routes/events');
 var expressValidator = require('express-validator');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
@@ -40,7 +40,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(expressValidator({customValidators: {
-    passwordMatch: (password, confirm) => password === confirm
+    passwordMatch: (password, confirm) => password === confirm,
+    isFuture: (date) => date > Date.now()
 }}));
 
 
@@ -62,6 +63,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', appAPI);
 app.use('/users', users);
 app.use('/players', players);
+app.use('/events', events);
 app.use('/', login);
 
 
@@ -97,6 +99,8 @@ app.use(function (err, req, res, next) {
 });
 
 mongoose.connect(mongoURI + '/golf-reg');
+
+app.listen(3000);
 
 //console.log("connecting to " + mongoURI + "/golf-reg");
 //console.log(mongooseUri);
