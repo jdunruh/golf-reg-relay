@@ -23,6 +23,13 @@ var validateEvent = function(req) {
 };
 
 
+var convertEventDatesAndTimes = function(event) {
+    event.flights.forEach(function(el) {
+        console.log('about to update time for ' + el.time);
+        el.time = new Date(event.date + " " + el.time + " UTC");
+    });
+    event.date = new Date(event.date + " UTC");
+};
 
 
 
@@ -51,16 +58,17 @@ var newAction = function(req, res) {
 };
 
 var createAction = function(req, res, next) {
-    console.log('entering create action');
+    console.log("crete adction");
     var mappedErrors = validateEvent(req);
     if(mappedErrors) {
-        console.log('validation errors');
         console.log(mappedErrors);
         res.render('events/new.jade', {event: req.body, errors: mappedErrors});
     } else {
+        convertEventDatesAndTimes(req.body);
         var event = new events.Event(req.body);
-        console.log('about to save');
+        event.filterStatus();
         console.log(event);
+        console.log("persisting");
         csp.go(function*() {
             var result = yield csp.take(persist.saveModel(event));
             if (result instanceof Error)
@@ -73,11 +81,50 @@ var createAction = function(req, res, next) {
 
 var showAction = function(req, res, next) {
     csp.go(function*() {
-        var myEvent = yield csp.take(persist.getModelById(events.Event, req.params._id));
-        if(result instanceof Error)
+        var myEvent = yield csp.take(persist.getModelById(events.Event, req.params.id));
+        if(myEvent instanceof Error)
             next(404, myEvent);
         else
             res.render('events/show.jade', {event: myEvent, errors: {}});
+    })
+};
+
+var editAction = function(req, res, next) {
+    csp.go(function*() {
+        event.filterStatus();
+        convertEventDatesAndTimes(event);
+        var myEvent = yield csp.take(persist.getModelById(events.Event, req.params.id))
+        if(result instanceof Error)
+            next(404, myEvent);
+        else
+            res.renden('events/edit.jade', {event: myEvent, errors: {}})
+    })
+};
+
+var updateAction = function(req, res, next) {
+    var mappedErrors = validateEvent(req);
+    if(mappedErrors) {
+        res.render('events/new.jade', {event: req.body, errors: mappedErrors});
+    } else {
+        var event = new events.Event(req.body);
+        event.filterStatus();
+        csp.go(function*() {
+            var result = yield csp.take(persist.saveModel(event));
+            if (result instanceof Error)
+                next(500, result);
+            else
+                res.redirect('/events');
+        })
+    }
+};
+
+var deleteAction = function(req, res, next) {
+    csp.go(function*() {
+        var result = yield csp.take(persist.removeModel(req.body.id))
+        if(result instanceof Error)
+            next(500, result);
+        else
+            res.redirect('/events');
     })
 };
 
@@ -90,11 +137,11 @@ router.get('/new', newAction);
 // show
 router.get('/:id', showAction);
 // edit
-router.get('/:id/edit', function() {});
+router.get('/:id/edit', editAction);
 // update
-router.post('/:id', function() {});
+router.post('/:id', updateAction);
 // delete
-router.post(':/id/delete', function() {});
+router.post(':/id/delete', deleteAction);
 
 module.exports = router;
 

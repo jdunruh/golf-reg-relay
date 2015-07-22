@@ -1,0 +1,26 @@
+extends ../common/layout
+block title
+   title "Events List"
+block content
+   #content
+      table
+         thead
+            tr
+               td Event
+               td Date
+               td location
+               td
+               td
+               td
+         tbody
+            each event in events
+               tr
+                  td= event.name
+                  td= event.date
+                  td= event.location
+                  td
+                     a(href="/events/#{event._id}") Show Details
+                  td
+                     a(href="/events/#{event._id}/edit") Edit
+                  td
+                     a(href="/events/#{event.id}/delete", class="delete-link") Delete

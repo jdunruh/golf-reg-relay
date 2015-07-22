@@ -35,10 +35,6 @@ playersSchema.pre('save', function(next) {
         return fixPassword(this, 10,this.password, next)
 });
 
-playersSchema.pre('update', function(next) {
-    if(!this.isModified('password'))
-        return fixPassword(this, 10, this.password, next)
-});
 
 playersSchema.methods.comparePassword = function(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, function(err, match) {
@@ -52,6 +48,6 @@ playersSchema.methods.comparePassword = function(candidatePassword, cb) {
 
 
 module.exports = {
-   Player: mongoose.model('Players', playersSchema)
+   Player: mongoose.model('Player', playersSchema)
 };
 

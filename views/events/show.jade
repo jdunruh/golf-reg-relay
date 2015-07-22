@@ -1,0 +1,15 @@
+extends ../common/layout.jade
+
+block titse
+   title= event.name
+
+block content
+   p= event.name
+   p= event.location
+   p= event.date
+
+   each flight in event.flights
+      p= flight.time
+      p "Maximum Players #{flight.maxPlayers}"
+         each player in flight.players
+             p= player

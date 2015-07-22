@@ -65,25 +65,18 @@ eventSchema.methods.filterStatus = function() {
     })
 };
 
-// convert strings to dates on save
-eventSchema.pre('save', function(next) {
-    this.flights.forEach(function(el) {
-        el.time = new Date(dayString + " " + timeString + " UTC");
-    });
-    this.date = new Date(this.date + " UTC");
-    next();
-});
 
 // sort the flights by time and convert dates to strings on read
-eventSchema.pre('init', function(next) {
-    this.flights.sort(function(flight1, flight2) {
-        return flight1.time.getTime() -  flight2.time.getTime();
-    });
-    this.flights.forEach(function(el) {
-        el.time = dateToTimeString(el.time);
-    });
-    this.date = dateToDayString(this.date);
-    next();
+eventSchema.post('find', function(result) {
+    result.forEach(function(event) {
+        event.flights.sort(function(flight1, flight2) {
+            return flight1.time.getTime() -  flight2.time.getTime();
+        });
+        event.flights.forEach(function(el) {
+            el.time = dateToTimeString(el.time);
+        });
+        event.date = dateToDayString(event.date);
+    })
 });
 
 var Event = mongoose.model('Event', eventSchema);

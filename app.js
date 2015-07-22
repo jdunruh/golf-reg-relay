@@ -56,7 +56,7 @@ app.use(expressValidator({
                     return false;
                 return date.getTime() < Date.now() ? false : true;
             }
-        },
+        }
     }
 ));
 

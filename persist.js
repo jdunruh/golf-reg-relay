@@ -50,11 +50,13 @@ module.exports = {
     },
     getModelById: function(model, id) { // channel gets _id of player
         var ch = csp.chan();
-        model.findById(player, function(err,docs) {
+        model.findById(id, function(err,docs) {
             if(err)
-                csp.putAsync(channel, err);
+                csp.putAsync(ch, err);
+            else if(docs === null)
+                csp.putAsync(ch, new Error("nothing found"));
             else
-                csp.putAsync(channel, docs);
+                csp.putAsync(ch, docs);
         });
         return ch;
     },
@@ -92,8 +94,11 @@ module.exports = {
         console.log(model);
         var ch = csp.chan();
         model.save(function(err, result) {
-            if(err)
+            if(err) {
+                console.log("error leg in persist");
+                console.log(err);
                 csp.putAsync(ch, err);
+            }
             else
                 csp.putAsync(ch, result);
         });
