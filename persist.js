@@ -88,10 +88,10 @@ module.exports = {
         });
         return ch;
     },
-    saveModel: function(player) {
-        console.log(player);
+    saveModel: function(model) {
+        console.log(model);
         var ch = csp.chan();
-        player.save(function(err, result) {
+        model.save(function(err, result) {
             if(err)
                 csp.putAsync(ch, err);
             else

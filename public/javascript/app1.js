@@ -13,10 +13,9 @@ $(document).ready(function() {
         $(e.target).next('form').submit();
         });
     $('.flights').on('click', 'button.edit-delete-flight', function() {
-        $(this).closest('.flight').addClass('hidden-flight');
-        var name = $(this).find(':input:first-of-type').attr('name');
-        var index = re.exec(name)[1];
-        $(this).closest('.flight').prepend('<input type="hidden" name="flights[' + index + '][deleted]" value="1"');
+        var flight = $(this).closest('.flight');
+        flight.addClass('hidden-flight');
+        flight.find('input[type="hidden"]').val("deleted");
     });
     $('.flights').on('click', 'button.new-delete-flight', function() {
         $(this).closest('.flight').remove();
@@ -24,14 +23,17 @@ $(document).ready(function() {
 
     $('.add-flight').on('click', function(e) {
         e.preventDefault();
-        var idx = "_new" + Date.now();
-       var clone = $('#template .flight').clone();
-        clone.find(':input').each(function(index, el) {
-            var attrName = $(el).attr('name').replace(reAttr, "$1idx$2");
+        var allFlights = $('.flights .flight');
+        var nextIndex = parseInt((allFlights.length === 0) ? 0 : re.exec(allFlights.last()
+            .find('input[type="hidden"]:first-of-type').attr('name'))[1], 10) + 1;
+        var clone = $('#template .flight').clone();
+        clone.find('input').each(function(index, el) {
+            var attrName = $(el).attr('name').replace(reAttr, "$1" + nextIndex + "$2");
             $(el).attr('name', attrName)
         });
+        clone.find('.new-flag').val("added");
         clone.appendTo('.flights');
     });
-    $('.datepicker').datepicker();
+ //   $('.datepicker').datepicker();
 });
 

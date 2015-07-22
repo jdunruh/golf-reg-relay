@@ -37,12 +37,28 @@ app.use(logger('dev'));
 app.use(express.static('.'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(expressValidator({customValidators: {
-    passwordMatch: (password, confirm) => password === confirm,
-    isFuture: (date) => date > Date.now()
-}}));
+app.use(expressValidator({
+        customValidators: {
+            passwordMatch: (password, confirm) => password === confirm,
+            isTime: function (timeString) {
+                var match = timeString .match(/^(\d\d):(\d\d)$|^(\d):(\d\d)$/);
+                if (match == null)
+                    return false;
+                var hours = parseInt(match[1], 10);
+                var mins = parseInt(match[2], 10);
+                return (hours >= 0 && hours <= 23 && mins >= 0 && mins <= 59);
+            },
+            isFutureDate: function(dateString) {
+                var date = new Date(dateString);
+                if(isNaN(date))
+                    return false;
+                return date.getTime() < Date.now() ? false : true;
+            }
+        },
+    }
+));
 
 
 app.use(cookieParser());
