@@ -33,8 +33,6 @@ var convertEventDatesAndTimes = function(event) {
 
 
 
-
-
 var indexAction = function(req, res, next) {
     csp.go(function* () {
         var allEvents = yield csp.take(persist.getAll(events.Event));
@@ -58,7 +56,6 @@ var newAction = function(req, res) {
 };
 
 var createAction = function(req, res, next) {
-    console.log("crete adction");
     var mappedErrors = validateEvent(req);
     if(mappedErrors) {
         console.log(mappedErrors);
@@ -91,13 +88,11 @@ var showAction = function(req, res, next) {
 
 var editAction = function(req, res, next) {
     csp.go(function*() {
-        event.filterStatus();
-        convertEventDatesAndTimes(event);
-        var myEvent = yield csp.take(persist.getModelById(events.Event, req.params.id))
-        if(result instanceof Error)
+        var myEvent = yield csp.take(persist.getModelById(events.Event, req.params.id));
+        if(myEvent instanceof Error)
             next(404, myEvent);
         else
-            res.renden('events/edit.jade', {event: myEvent, errors: {}})
+            res.render('events/edit.jade', {event: myEvent, errors: {}})
     })
 };
 
@@ -107,6 +102,7 @@ var updateAction = function(req, res, next) {
         res.render('events/new.jade', {event: req.body, errors: mappedErrors});
     } else {
         var event = new events.Event(req.body);
+        convertEventDatesAndTimes(event);
         event.filterStatus();
         csp.go(function*() {
             var result = yield csp.take(persist.saveModel(event));

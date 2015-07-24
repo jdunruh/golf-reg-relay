@@ -8,7 +8,7 @@ mixin _event-form
       .error
          = errors.date.msg
    label Event Date
-      input(type="date", name="date", class="datepicker", value= event.date, required)
+      input(type="date", name="date", class="datepicker", value= event.dateToHTMLValue(), required)
    if errors.location
       .error
          = errors.location.msg

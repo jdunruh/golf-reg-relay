@@ -1,15 +1,15 @@
 extends ../common/layout.jade
 
-block titse
+block title
    title= event.name
 
 block content
    p= event.name
    p= event.location
-   p= event.date
-
-   each flight in event.flights
-      p= flight.time
-      p "Maximum Players #{flight.maxPlayers}"
+   p= event.dateToDayString()
+   p Tee Times
+   each flight, index in event.flights
+      p= event.dateToTimeString(index)
+      p #{flight.maxPlayers} Players
          each player in flight.players
              p= player

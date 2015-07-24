@@ -66,7 +66,10 @@ module.exports = {
           if(err)
             csp.putAsync(ch, err);
           else
-            csp.putAsync(ch, docs);
+            if(docs === null)
+                csp.putAsync(ch, new Error("not found"));
+            else
+                csp.putAsync(ch, docs);
         });
         return ch;
     },
@@ -75,6 +78,8 @@ module.exports = {
         model.find({}, function(err, docs) {
             if(err)
                 csp.putAsync(ch, err);
+            else if(docs === null)
+                csp.putAsync(new Error("nothing found"));
             else
                 csp.putAsync(ch, docs)
         });
@@ -85,6 +90,8 @@ module.exports = {
         model.find({resetToken: token}, function(err, docs) {
             if(err)
                 csp.putAsync(ch, err);
+            else if(docs === null)
+                csp.putAsync(new Error("not found"));
             else
                 csp.putAsync(ch, docs)
         });

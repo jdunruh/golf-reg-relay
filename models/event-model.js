@@ -17,14 +17,31 @@ var eventSchema = new mongoose.Schema({
     organizations: [ObjectId]
 });
 
-var dateToDayString = function(date) {
-    return date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
+eventSchema.methods.dateToDayString = function() {
+    return (this.date.getUTCMonth() + 1) + "/" + this.date.getUTCDate() + "/" + this.date.getUTCFullYear();
 };
 
-var dateToTimeString = function(date) {
+eventSchema.methods.dateToHTMLValue = function() {
+    var UTCMonth = this.date.getUTCMonth() + 1;
+    var UTCDate = this.date.getUTCDate();
+    if(UTCMonth < 10)
+        UTCMonth = "0" + UTCMonth;
+    if(UTCDate < 10)
+        UTCDate = "0" + UTCDate;
+    return this.date.getUTCFullYear() +  "-" + UTCMonth + "-" + UTCDate;
+};
+
+eventSchema.methods.dateToHTMLTimeValue = function(flight) {
+    var UTCMinutes = flight.time.getUTCMinutes();
+    if(UTCMinutes < 10)
+        UTCMinutes = "0" + UTCMinutes;
+    return flight.time.getUTCHours() + ":" + UTCMinutes;
+};
+
+flightSchema.methods.dateToTimeString = function() {
     var hour = 0;
     var amPm = "AM";
-    var UTCHours = date.getUTCHours;
+    var UTCHours = this.time.getUTCHours();
     switch (UTCHours) {
         case 0:
             hour = 12;
@@ -52,7 +69,10 @@ var dateToTimeString = function(date) {
             hour = UTCHours - 12;
             amPm = "PM";
     }
-    return hour + ":" + date.getUTCMinutes() + " " + amPm;
+    var UTCMinutes = this.time.getUTCMinutes();
+    if(UTCMinutes < 10)
+        UTCMinutes = "0" + UTCMinutes;
+    return hour + ":" + UTCMinutes + " " + amPm;
 };
 
 // remove any flights deleted by the user, and delete the "status" property that should not be saved
@@ -66,18 +86,6 @@ eventSchema.methods.filterStatus = function() {
 };
 
 
-// sort the flights by time and convert dates to strings on read
-eventSchema.post('find', function(result) {
-    result.forEach(function(event) {
-        event.flights.sort(function(flight1, flight2) {
-            return flight1.time.getTime() -  flight2.time.getTime();
-        });
-        event.flights.forEach(function(el) {
-            el.time = dateToTimeString(el.time);
-        });
-        event.date = dateToDayString(event.date);
-    })
-});
 
 var Event = mongoose.model('Event', eventSchema);
 

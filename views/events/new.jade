@@ -10,11 +10,11 @@ block content
         .flights
             each flight, index in event.flights
                 if errors.flights
-                    +_flight-form(flight, errors.flights[index], index, true)
+                    +_flight-form(flight, errors.flights[index], index, "", true)
                 else
                     +_flight-form(flight, {}, index, true)
         button(type="submit") Create Event
         button(class="add-flight") Add Another Time
     a(href= "#{referrer}") Back
     #template
-        +_flight-form({}, {}, 0)
+        +_flight-form({}, {}, 0, "", true))
