@@ -1,6 +1,8 @@
 mixin _flight-form(flight, errors, index, time, newForm)
    .flight
       button(class= newForm ? "new-delete-flight" : "edit-delete-flight") Delete
+      if flight._id
+         input(type="hidden", name="flights[#{index}][_id]", value= flight._id)
       if errors.time
          .error
             = errors.name.msg

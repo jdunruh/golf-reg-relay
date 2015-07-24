@@ -26,6 +26,7 @@ var validateEvent = function(req) {
 var convertEventDatesAndTimes = function(event) {
     event.flights.forEach(function(el) {
         console.log('about to update time for ' + el.time);
+        console.log("setting date to " + event.date + " " + el.time + " UTC");
         el.time = new Date(event.date + " " + el.time + " UTC");
     });
     event.date = new Date(event.date + " UTC");
@@ -101,8 +102,8 @@ var updateAction = function(req, res, next) {
     if(mappedErrors) {
         res.render('events/new.jade', {event: req.body, errors: mappedErrors});
     } else {
+        convertEventDatesAndTimes(req.body);
         var event = new events.Event(req.body);
-        convertEventDatesAndTimes(event);
         event.filterStatus();
         csp.go(function*() {
             var result = yield csp.take(persist.saveModel(event));

@@ -1,4 +1,6 @@
 mixin _event-form
+   if event._id
+      input(type="hidden", name="_id", value= event._id)
    if errors.name
       .error
          = errors.name.msg
