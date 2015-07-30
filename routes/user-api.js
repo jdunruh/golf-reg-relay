@@ -12,7 +12,7 @@ var events = require('../models/event-model');
 
 
 // seed database for testing purposes
-var eventTestData = {
+/*var eventTestData = {
     date: 'Tuesday',
     location: 'Fossil Trace',
     flights: [
@@ -25,7 +25,7 @@ var event = new events.Event(eventTestData);
 
 events.Event.remove({}, function(err, result) {
     event.save();
-});
+});*/
 
 
 router.get('/getAllEVents', function(req, res, next) {
@@ -80,6 +80,10 @@ router.patch('/movePlayer/', function(req, res, next) {
             })
         }
     })
+});
+
+router.get('/getCurrentUser', function(req, res, next) {
+    res.status(200).json({user: req.user.name, id: req.user._id})
 });
 
 

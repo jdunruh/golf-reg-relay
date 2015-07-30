@@ -25,11 +25,14 @@ var validateEvent = function(req) {
 
 var convertEventDatesAndTimes = function(event) {
     event.flights.forEach(function(el) {
-        console.log('about to update time for ' + el.time);
-        console.log("setting date to " + event.date + " " + el.time + " UTC");
         el.time = new Date(event.date + " " + el.time + " UTC");
     });
     event.date = new Date(event.date + " UTC");
+};
+
+var todayAsDate = function() {
+    var today = new Date();
+    return new  Date((today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + " UTC");
 };
 
 
@@ -45,13 +48,16 @@ var indexAction = function(req, res, next) {
 };
 
 var newAction = function(req, res) {
-    res.render('events/new.jade', {event: {name: '',
-                                    location: '',
-                                    date: '',
-                                    flights: [
-                                        {time: '',
-                                        maxPlayers: ''}
-                                    ]},
+    var myEvent = new events.Event({name: '',
+        location: '',
+        date: todayAsDate(),
+        flights: [
+            {time: '',
+                maxPlayers: ''}
+        ]});
+
+    res.render('events/new.jade',
+                            {event: myEvent,
                                     errors: {},
                                     referrer: req.get('Referrer')})
 };
@@ -117,7 +123,7 @@ var updateAction = function(req, res, next) {
 
 var deleteAction = function(req, res, next) {
     csp.go(function*() {
-        var result = yield csp.take(persist.removeModel(req.body.id))
+        var result = yield csp.take(persist.removeModel(events.Event, req.params.id));
         if(result instanceof Error)
             next(500, result);
         else
@@ -138,7 +144,7 @@ router.get('/:id/edit', editAction);
 // update
 router.post('/:id', updateAction);
 // delete
-router.post(':/id/delete', deleteAction);
+router.post('/:id/delete', deleteAction);
 
 module.exports = router;
 

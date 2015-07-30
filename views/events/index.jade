@@ -16,7 +16,7 @@ block content
             each event in events
                tr
                   td= event.name
-                  td= event.date
+                  td= event.dateToDayString()
                   td= event.location
                   td
                      a(href="/events/#{event._id}") Show Details

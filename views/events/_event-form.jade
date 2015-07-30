@@ -1,4 +1,4 @@
-mixin _event-form
+mixin _event-form(event, errors)
    if event._id
       input(type="hidden", name="_id", value= event._id)
    if errors.name

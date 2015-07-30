@@ -31,6 +31,7 @@ eventSchema.methods.dateToHTMLValue = function() {
     return this.date.getUTCFullYear() +  "-" + UTCMonth + "-" + UTCDate;
 };
 
+
 eventSchema.methods.dateToHTMLTimeValue = function(flight) {
     var UTCMinutes = flight.time.getUTCMinutes();
     if(UTCMinutes < 10)
