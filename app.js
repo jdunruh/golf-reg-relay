@@ -7,18 +7,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var schema = mongoose.schema;
-var cookieSession = require('cookie-session');
 var flash = require('express-flash');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
 var appAPI = require('./routes/user-api.js');
-var users = require('./routes/users');
-var players = require('./routes/players');
+var playersRoute = require('./routes/players.js');
+var players = require('./models/player-model');
 var login = require('./routes/login');
 var events = require('./routes/events');
 var expressValidator = require('express-validator');
+var session = require('express-session');
+var users = require('./routes/users');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
 
@@ -31,13 +32,23 @@ app.set('trust proxy', 1); // trust first proxy
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
-app.use(express.static('.'));
-
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({
+    secret: '123456',
+    resave: false,
+    saveUninitialized: false,
+    path:"/*" //NEEDED
+
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use(expressValidator({
         customValidators: {
@@ -61,24 +72,32 @@ app.use(expressValidator({
 ));
 
 
-app.use(cookieParser());
+//app.use(cookieParser());
+/*
 app.use(cookieSession({
     name: 'session',
     keys: [process.env.SESSION_KEY_1, process.env.SESSION_KEY_2, process.env.SESSION_KEY_3, process.env.SESSION_KEY_4],
     signed: true,
-    secureProxy: true
+    secureProxy: false
 }));
+*/
 app.use(flash());
 
-app.use(passport.initialize());
-app.use(passport.session());
+passport.serializeUser(function(player, done) {
+    done(null, player._id);
+});
+
+passport.deserializeUser(function(id, done) {
+    players.Player.findById(id, function(err, player) {
+        done(err, player);
+    });
+});
 
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', appAPI);
 app.use('/users', users);
-app.use('/players', players);
+app.use('/players', playersRoute);
 app.use('/events', events);
 app.use('/', login);
 

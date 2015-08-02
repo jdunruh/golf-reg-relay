@@ -28,8 +28,8 @@ var getInitialDataFromServer = function () {
 };
 
 
-var getCurrentPlayer = function() {
-    return currentPlayer;
+var getCurrentPlayerName = function() {
+    return currentPlayer.get('name');
 };
 
 AppDispatcher.register(function(payload){
@@ -46,8 +46,9 @@ AppDispatcher.register(function(payload){
 
 
 module.exports = {
-    getCurrentPlayer: getCurrentPlayer,
-    resetStore: resetstore
+    getCurrentPlayerName: getCurrentPlayerName,
+    resetStore: resetStore,
+    getInitialDataFromServer: getInitialDataFromServer
 };
 
 

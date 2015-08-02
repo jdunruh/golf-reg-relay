@@ -8,15 +8,6 @@ var mailer = require('../mailer');
 var csp = require('js-csp');
 var players = require('../models/player-model');
 
-passport.serializeUser(function(user, done) {
-    done(null, user._id);
-});
-
-passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-        done(err, user);
-    });
-});
 
 passport.use(new LocalStrategy(
     function(username, password, done) {
@@ -54,21 +45,13 @@ const loginForm = function(req, res, next) {
     },
     resetSubmission = function(req, res, next) {
         csp.go(function* () {
-            console.log('in reset submission');
-            console.log('email is ' + req.body.username);
             var ret = yield csp.take(persist.getPlayerByEmail(players.Player, req.body.username));
             if ((ret instanceof Error) || (ret.length === 0)) // could not find email
                 res.redirect('/reset');
             var player = ret[0];
-            console.log(player);
-            console.log('got player');
             var resetToken = yield csp.take(mailer.generateToken());
-            console.log('have reset token');
-            console.log('about to update');
             var result = yield csp.take(persist.updateModel(players.Player, {_id: player._id, resetToken: resetToken,
                                                                                 resetExpires: (Date.now() + 87000000)})); // 24 hr expiration
-            console.log('updated player');
-            console.log(result);
             var host = req.protocol + "://" + req.headers.host;
             console.log(host);
             if (result instanceof Error)

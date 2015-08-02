@@ -3,6 +3,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var common = require('./common');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -29,11 +30,23 @@ events.Event.remove({}, function(err, result) {
 
 
 router.get('/getAllEVents', function(req, res, next) {
-    events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) {
+    events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) { // get events sorted by date
         if(err) {
             res.status(404).json(err);
-        } else {
-            res.status(200).json(docs);
+        } else { // have good data. Sort events by date then flights by time and then convert date and time values for display
+            var events = []
+            docs.forEach(function(event, index) {
+                events[index] = {organization: event.organization,
+                                 flights: [],
+                                 date: event.dateToDayString()};
+                event.flights.sort((flight1, flight2) => flight1.time.getTime() - flight2.time.getTime());
+                event.flights.forEach(function(flight, jdx) {
+                    events[index].flights[jdx] = {time: common.dateToTimeString(flight.time),
+                                                  maxPlayers: flight.maxPlayers,
+                                                  players: flight.players};
+                });
+            });
+            res.status(200).json(events);
         }
     })
 });
@@ -83,7 +96,7 @@ router.patch('/movePlayer/', function(req, res, next) {
 });
 
 router.get('/getCurrentUser', function(req, res, next) {
-    res.status(200).json({user: req.user.name, id: req.user._id})
+    res.status(200).json({name: req.user.name, id: req.user._id})
 });
 
 

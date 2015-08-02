@@ -2,6 +2,7 @@ var im = require('immutable');
 var utils = require('../common/utils');
 var React = require('react');
 var eventStore = require('../stores/eventStore');
+var playerStore = require('../stores/playerStore');
 var actions = require('../actions/eventActions');
 
 /*
@@ -45,7 +46,6 @@ var TimeSelector = React.createClass({
         this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
     handleSelectChange: function (e) {
-        console.log("setting timeSelect to " + e.target.value);
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function (e) {
@@ -79,7 +79,7 @@ var TeeTime = React.createClass({
             <table className="tee-time">
                 <tbody>
                 <tr>
-                    <td>{ this.props.timeData.get("time") + " maximum players " +this.props.timeData.get("maxPlayers") }</td>
+                    <td>{this.props.timeData.get("time") + " maximum players " +this.props.timeData.get("maxPlayers")}</td>
                 </tr>
                 { players }
                 </tbody>
@@ -118,13 +118,14 @@ var TeeTimeTable = React.createClass({
     },
     render: function () {
         return ( <div id="tee-time-table">
-            <TimeSelector event={ this.state.events.get(0) } player={ utils.getCurrentPlayerName() }/>
+            <TimeSelector event={ this.state.events.get(0) } player={ playerStore.getCurrentPlayerName() }/>
             <TeeTimeList teeTimes={ this.state.events.get(0).get("flights") }/>
         </div>)
     }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    playerStore.getInitialDataFromServer();
     eventStore.getInitialDataFromServer(function() {
         React.render(<TeeTimeTable />, document.getElementById('container'));
     });

@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var events = require('../models/event-model');
 var persist = require('../persist');
 var csp = require('js-csp');
+var common = require('./common.js');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -30,10 +31,7 @@ var convertEventDatesAndTimes = function(event) {
     event.date = new Date(event.date + " UTC");
 };
 
-var todayAsDate = function() {
-    var today = new Date();
-    return new  Date((today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + " UTC");
-};
+
 
 
 
@@ -50,7 +48,7 @@ var indexAction = function(req, res, next) {
 var newAction = function(req, res) {
     var myEvent = new events.Event({name: '',
         location: '',
-        date: todayAsDate(),
+        date: common.todayAsDate(),
         flights: [
             {time: '',
                 maxPlayers: ''}

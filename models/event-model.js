@@ -39,42 +39,6 @@ eventSchema.methods.dateToHTMLTimeValue = function(flight) {
     return flight.time.getUTCHours() + ":" + UTCMinutes;
 };
 
-flightSchema.methods.dateToTimeString = function() {
-    var hour = 0;
-    var amPm = "AM";
-    var UTCHours = this.time.getUTCHours();
-    switch (UTCHours) {
-        case 0:
-            hour = 12;
-            amPm = "AM";
-            break;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-            hour = UTCHours;
-            amPm = "AM";
-            break;
-        case 12:
-            hour = 12;
-            amPm = "PM";
-            break;
-        default:
-            hour = UTCHours - 12;
-            amPm = "PM";
-    }
-    var UTCMinutes = this.time.getUTCMinutes();
-    if(UTCMinutes < 10)
-        UTCMinutes = "0" + UTCMinutes;
-    return hour + ":" + UTCMinutes + " " + amPm;
-};
 
 // remove any flights deleted by the user, and delete the "status" property that should not be saved
 eventSchema.methods.filterStatus = function() {
