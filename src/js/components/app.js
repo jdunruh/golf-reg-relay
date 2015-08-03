@@ -29,10 +29,10 @@ function generateButtons(event, player, addFn, removeFn, moveFn) {
        return <span><button onClick={addFn}>Add Me At</button></span>
     } else {
         if(utils.availableFlights(event.get("flights")).count() === 0) { // in event, but no place to move
-            return <button onClick={removeFn}>Cancel My Time</button>;
+            return <button className="btn" onClick={removeFn}>Cancel My Time</button>;
         } else {                                                        // in event, can move
-            return (<span><button onClick={removeFn}>Cancel My Time</button>
-            <button onClick={moveFn}>Move Me To</button></span>); // span tag required to prevent JSX error
+            return (<span><button className="btn" onClick={removeFn}>Cancel My Time</button>
+            <button className="btn" onClick={moveFn}>Move Me To</button></span>); // span tag required to prevent JSX error
         }
     }
 }
@@ -50,7 +50,7 @@ var TimeSelector = React.createClass({
     },
     handleRemove: function (e) {
         e.preventDefault();
-        actions.removeModel({event: 0, player: this.props.player});
+        actions.removePlayer({event: 0, player: this.props.player});
     },
     handleAdd: function (e) {
         e.preventDefault();
@@ -61,7 +61,7 @@ var TimeSelector = React.createClass({
         actions.movePlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
     },
     render: function () {
-        return ( <form>
+        return ( <form className="form-box">
             {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove)}
             {generateSelect(this.props.event, this.state.timeSelect, this.handleSelectChange, this.props.player)}
         </form>);
