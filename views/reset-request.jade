@@ -1,9 +1,11 @@
 extends common/layout.jade
 block title
-title Golf Signup - Reset Password
-link(rel="stylesheet" href="/public/stylesheets/login.css")
-    block content
-        form(class=login - box, action="/reset", method="post")
-            label email
-                input(type='text', placeholder="mail@example.com", name='username')
-            button(type="submit") Start Reset
+    title Golf Signup - Reset Password
+    link(rel="stylesheet" href="/stylesheets/user.css")
+
+block content
+    h1 Reset Password
+    form(class="form-box", action="/reset", method="post")
+        label email
+            input(type='text', placeholder="mail@example.com", name='username')
+        button(type="submit", class="btn") Start Reset

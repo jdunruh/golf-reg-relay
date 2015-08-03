@@ -10,6 +10,7 @@ var babelify = require('babelify');
 var jasmine = require('jasmine');
 var reporters = require('jasmine-reporters');
 var combiner = require('stream-combiner2');
+var sass = require('gulp-sass');
 
 var path = {
     HTML: './src/index.html',
@@ -18,12 +19,15 @@ var path = {
     DEST: './public/index.html',
     DEST_BUILD: './public/javascript',
     DEST_SRC: './public/javascript',
+    DEST_CSS: './public/stylesheets',
     ENTRY_POINT: './src/js/components/app.js',
     CLIENT_JS: ['scr/js/client/**', 'src/js/common/**', 'src/js/components/**', 'src/js/dispatchers/**', 'src/js/stores/**'],
     CLIENT_JASMINE: ['src/js/client/**', 'src/js/common/**', 'src/js/dispatchers/**', 'src/js/stores/**'],
     SERVER_JS: ['scr/js/server/**', 'src/js/common/**'],
     CLIENT_OUT: 'app.js',
-    SERVER_OUT: 'server.js'
+    SERVER_OUT: 'server.js',
+    CSS_SRC: './src/scss/*.scss',
+    CSS_ENTRY: './src/scss/app.scss'
 };
 
 gulp.task('copy', function(){
@@ -44,7 +48,7 @@ gulp.task('watch', function() {
     var combined = combiner.obj([ watcher.on('update', function () {
         watcher.bundle()
             .pipe(source(path.OUT))
-            .pipe(gulp.dest(path.DEST_SRC))
+            .pipe(gulp.dest(path.DEST_SRC));
         console.log('Updated');
     })
         .bundle()
@@ -99,6 +103,17 @@ gulp.task('replaceHTML', function(){
         .pipe(gulp.dest(path.DEST));
 });
 
+gulp.task('sass', function () {
+    gulp.src('pth.CSS_ENTRY')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest(path.DEST_CSS));
+});
+
+gulp.task('sass:watch', function () {
+    gulp.watch(path.CSS_SRC);
+});
+
+
 gulp.task('production', ['replaceHTML', 'build']);
 
-gulp.task('default', ['watch']);
+gulp.task('default', ['watch', 'sass:watch']);

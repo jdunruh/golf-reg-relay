@@ -1,9 +1,9 @@
 extends common/layout.jade
 block title
-    title Golf Registration
-    link(rel="stylesheet" href="/public/stylesheets/login.css")
+    title Golf Registration - Reset Password
+    link(rel="stylesheet" href="/stylesheets/user.css")
 block content
-    form(class=login - box, action="/doreset/#{token}", method="post")
+    form(class="form-box", action="/doreset/#{token}", method="post")
         if errors.email
             .error
                 = errors.email.msg
@@ -19,4 +19,4 @@ block content
                 = errors.password-confirm.msg
         label confirm password
           input(type="password", name="password-confirm")
-        button(type="submit") Reset Password
+        button(type="submit", class="btn") Reset Password

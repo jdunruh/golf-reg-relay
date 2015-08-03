@@ -1,0 +1,23 @@
+@import 'normalize';
+@import 'palette';
+@import 'fonts';
+
+h1 h2 {
+  font-family: $sans;
+  font-weight: bold;
+}
+
+h3 h4 {
+  font-family: $sans;
+}
+
+html {
+  background-color: $background;
+}
+
+body {
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+@import 'forms';

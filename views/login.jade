@@ -2,13 +2,14 @@ extends common/layout.jade
 
 block title
    title Golf Registration
-   link(rel="stylesheet" href="/stylesheets/login.css")
+   link(rel="stylesheet" href="/stylesheets/user.css")
 
 block content
-   form(class=login-box, action="/login", method="post")
+    h1 Tee Time Signup
+    form(class="form-box", action="/login", method="post")
         label email
             input(type='text', placeholder="mail@example.com", name='username')
         label password
             input(type="password", name="password")
-        input(type="submit")
+        input(type="submit" class="btn")
     a(href="/register") Register

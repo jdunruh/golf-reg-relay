@@ -23,6 +23,7 @@
     "express-session": "^1.11.3",
     "express-validator": "^2.12.2",
     "flux": "^2.0.3",
+    "gulp-sass": "^2.0.4",
     "immutable": "^3.7.3",
     "jade": "^1.11.0",
     "jasmine": "^2.3.1",

@@ -1,0 +1,54 @@
+a {
+  color: $highlight;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+input[type="text"], input[type="password"] {
+  margin-top: 5px;
+  margin-left: -5px;
+}
+
+label input {
+  display: block;
+}
+
+.error {
+  color: red;
+}
+
+form.delete {
+  display:none;
+}
+
+label.checkbox-label {
+  display: inline;
+}
+
+#template {
+  display: none;
+}
+
+.btn {
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: $sans;
+  color: #ffffff;
+  font-size: 18px;
+  background: #2b9720;
+  padding: 5px 10px 5px 10px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+input[type="text"], input[type="password"] {
+  width: 300px;
+}
