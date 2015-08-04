@@ -399,16 +399,25 @@ label.checkbox-label {
   display: none; }
 
 .btn {
-  -webkit-border-radius: 28;
-  -moz-border-radius: 28;
+  -webkit-border-radius: 28px;
+  -moz-border-radius: 28px;
   border-radius: 28px;
   font-family: "Source Sans Pro", sans-serif;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   background: #2b9720;
   padding: 5px 10px 5px 10px;
   text-decoration: none; }
 
 .btn:hover {
   text-decoration: none; }
+
+input[type="text"], input[type="password"] {
+  width: 300px; }
+
+select, option {
+  font-family: "Source Sans Pro", sans-serif;
+  color: #ffffff;
+  font-size: 16px;
+  background-color: #2b9720; }
 

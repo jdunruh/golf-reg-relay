@@ -34,12 +34,12 @@ label.checkbox-label {
 }
 
 .btn {
-  -webkit-border-radius: 28;
-  -moz-border-radius: 28;
+  -webkit-border-radius: 28px;
+  -moz-border-radius: 28px;
   border-radius: 28px;
   font-family: $sans;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   background: $highlight;
   padding: 5px 10px 5px 10px;
   text-decoration: none;
@@ -52,3 +52,12 @@ label.checkbox-label {
 input[type="text"], input[type="password"] {
   width: 300px;
 }
+
+select, option {
+  font-family: $sans;
+  color: #ffffff;
+  font-size: 16px;
+  background-color: $highlight;
+}
+
+

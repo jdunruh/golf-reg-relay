@@ -19,20 +19,50 @@ var generateSelect = function (event, value, changeFn, player) {
     } else { // list of options containing only those flights with room for more players
         var selectList = utils.findTimes(event, player).map(el =>
             <option key={el.get("index")} value={el.get("index")}>{el.get("time")}</option>);
-        return <select name="time" value={ value }
+        return <select className="time-select" name="time" value={ value }
                                 onChange={changeFn}> { selectList } </select>;
     }
 };
 
-function generateButtons(event, player, addFn, removeFn, moveFn) {
+function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initialSelectVal) {
     if(!utils.inTeeList(event, player)) {                       // not currently in event
-       return <span><button onClick={addFn}>Add Me At</button></span>
+       return <div>
+           <div className="left-buttons">
+           </div>
+           <div className="right-buttons">
+               <span>
+                   <button className="btn" onClick={addFn}>Add Me At</button>
+                   <div>
+                       {generateSelect(event, player, changeFn, initialSelectVal)}
+                   </div>
+               </span>
+           </div>
+       </div>;
     } else {
         if(utils.availableFlights(event.get("flights")).count() === 0) { // in event, but no place to move
-            return <button className="btn" onClick={removeFn}>Cancel My Time</button>;
+            return <div>
+                <div className="left-buttons">
+                    <button className="btn" onClick={removeFn}>Cancel My Time</button>
+                </div>
+                <div className="right-buttons">
+                    <span>
+                    </span>
+                </div>
+            </div>;
         } else {                                                        // in event, can move
-            return (<span><button className="btn" onClick={removeFn}>Cancel My Time</button>
-            <button className="btn" onClick={moveFn}>Move Me To</button></span>); // span tag required to prevent JSX error
+            return <div>
+                <div className="left-buttons">
+                    <button className="btn" onClick={removeFn}>Cancel My Time</button>
+                </div>
+                <div className="right-buttons">
+                    <span>
+                        <button className="btn" onClick={moveFn}>Move Me To</button>
+                        <div>
+                            {generateSelect(event, player, changeFn, initialSelectVal)}
+                        </div>
+                    </span>
+                </div>
+            </div>;
         }
     }
 }
@@ -61,9 +91,8 @@ var TimeSelector = React.createClass({
         actions.movePlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
     },
     render: function () {
-        return ( <form className="form-box">
+        return ( <form>
             {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove)}
-            {generateSelect(this.props.event, this.state.timeSelect, this.handleSelectChange, this.props.player)}
         </form>);
     }
 });
@@ -79,7 +108,7 @@ var TeeTime = React.createClass({
             <table className="tee-time">
                 <tbody>
                 <tr>
-                    <td>{this.props.timeData.get("time") + " maximum players " +this.props.timeData.get("maxPlayers")}</td>
+                    <td>{this.props.timeData.get("time") + " up to " + this.props.timeData.get("maxPlayers") + " players"}</td>
                 </tr>
                 { players }
                 </tbody>
@@ -117,7 +146,7 @@ var TeeTimeTable = React.createClass({
         eventStore.removeChangeListener(this._onChange);
     },
     render: function () {
-        return ( <div id="tee-time-table">
+        return ( <div id="tee-time-table" className="form-box">
             <TimeSelector event={ this.state.events.get(0) } player={ playerStore.getCurrentPlayerName() }/>
             <TeeTimeList teeTimes={ this.state.events.get(0).get("flights") }/>
         </div>)
