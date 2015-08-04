@@ -34,9 +34,12 @@ eventSchema.methods.dateToHTMLValue = function() {
 
 eventSchema.methods.dateToHTMLTimeValue = function(flight) {
     var UTCMinutes = flight.time.getUTCMinutes();
+    var UTCHours = flight.time.getUTCHours();
     if(UTCMinutes < 10)
         UTCMinutes = "0" + UTCMinutes;
-    return flight.time.getUTCHours() + ":" + UTCMinutes;
+    if(UTCHours < 10)
+        UTCHours = "0" + UTCHours;
+    return UTCHours + ":" + UTCMinutes;
 };
 
 

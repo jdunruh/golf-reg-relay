@@ -20,4 +20,15 @@ body {
   padding-top: 20px;
 }
 
+td { padding-left: 5px;
+     padding-right: 5px;}
+
 @import 'forms';
+
+#content table, #content form {
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+}

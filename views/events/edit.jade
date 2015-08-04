@@ -5,16 +5,16 @@ block content
    h1 Edit Event
    include ./_event-form
    include ./_flight-form
-   form(action="/events/#{id}", method="post")
+   form(action="/events/#{event._id}", method="post")
       +_event-form(event, errors)
       .flights
          each flight, index in event.flights
             if errors.flights
-               +_flight-form(flight, errors, index, event.dateToHTMLTimeValue(flight), false)
+               +_flight-form(flight, errors, index, flight.time, false)
             else
-               +_flight-form(flight, {}, index, event.dateToHTMLTimeValue(flight), false)
-      button(type="submit") Save Event
-      button(class="add-flight") Add Another Time
+               +_flight-form(flight, {}, index, flight.time, false)
+      button(type="submit" class="btn") Save Event
+      button(class="add-flight" class="btn") Add Another Time
    a(href= "#{referrer}") Back
    #template
       +_flight-form({}, {}, 0, "", false)

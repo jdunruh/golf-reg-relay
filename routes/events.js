@@ -87,7 +87,7 @@ var showAction = function(req, res, next) {
         if(myEvent instanceof Error)
             next(404, myEvent);
         else
-            res.render('events/show.jade', {event: myEvent, errors: {}});
+            res.render('events/show.jade', {event: myEvent, errors: {}, common: common});
     })
 };
 
@@ -96,15 +96,17 @@ var editAction = function(req, res, next) {
         var myEvent = yield csp.take(persist.getModelById(events.Event, req.params.id));
         if(myEvent instanceof Error)
             next(404, myEvent);
-        else
-            res.render('events/edit.jade', {event: myEvent, errors: {}})
+        else {
+            console.log(common.convertEventDocumentsToHTMLValues([myEvent])[0]);
+            res.render('events/edit.jade', {event: common.convertEventDocumentsToHTMLValues([myEvent])[0], errors: {}});
+        }
     })
 };
 
 var updateAction = function(req, res, next) {
     var mappedErrors = validateEvent(req);
     if(mappedErrors) {
-        res.render('events/new.jade', {event: req.body, errors: mappedErrors});
+        res.render('events/edit.jade', {event: req.body, errors: mappedErrors});
     } else {
         convertEventDatesAndTimes(req.body);
         var event = new events.Event(req.body);

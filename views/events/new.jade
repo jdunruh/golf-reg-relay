@@ -13,8 +13,8 @@ block content
                     +_flight-form(flight, errors.flights[index], index, "", true)
                 else
                     +_flight-form(flight, {}, index, true)
-        button(type="submit") Create Event
-        button(class="add-flight") Add Another Time
+        button(type="submit" class="btn") Create Event
+        button(class="add-flight", class="btn") Add Another Time
     a(href= "#{referrer}") Back
     #template
         +_flight-form({}, {}, 0, "", true)

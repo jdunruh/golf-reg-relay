@@ -9,7 +9,6 @@ block content
    p= event.dateToDayString()
    p Tee Times
    each flight, index in event.flights
-      p= event.dateToTimeString(index)
-      p #{flight.maxPlayers} Players
+      p #{common.dateToTimeString(flight.time)}  #{flight.maxPlayers} Players
          each player in flight.players
              p= player
