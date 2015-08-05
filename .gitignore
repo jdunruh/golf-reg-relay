@@ -12,8 +12,8 @@ test/target/classes/META-INF/maven/golf-test/golf-test/pom.properties
 golf-reg.iml
 data/db/*
 public/index.html
-public/javascript/app.js
 .env
+js/app.js
 
 
 
