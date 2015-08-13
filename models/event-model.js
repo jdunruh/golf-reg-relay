@@ -60,3 +60,14 @@ var Event = mongoose.model('Event', eventSchema);
 module.exports = {
     Event: Event
 };
+
+// update the object according to keys in arr (creating keys if needed) with the val
+var update = function(obj, keyArr,  val) {
+    if(keyArr.length === 1) {
+        obj[keyArr[0]] = val;
+    } else {
+        if(!obj[keyArr[0]])
+            obj[keyArr[0]]= {};
+        update(obj[keyArr[0]], keyArr.slice(1), val);
+   }
+};

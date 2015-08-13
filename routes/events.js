@@ -16,10 +16,13 @@ var validateEvent = function(req) {
     req.check('name', 'A name between 5 and 100 characters must be supplied').notEmpty().isLength(5, 100);
     req.check('location', 'A location between 5 and 100 characters must be supplied').notEmpty().isLength(5,100);
     req.body.flights.forEach(function(el, index) {
-        req.check(['flights', index, 'maxPlayers'], "Incorrect value for Maximum Players").notEmpty().isNumeric();
+        req.check(['flights', index, 'maxPlayers'], "Maximum Players must be a number").notEmpty().isNumeric();
         req.check(['flights', index, 'time'], "Must supply a valid time").notEmpty().isTime();
     });
     req.check('date', "A date later than today must be supplied").notEmpty().isFutureDate();
+    console.log('validation errors');
+    console.log(req.validationErrors());
+    console.log('-----');
     return req.validationErrors(true);
 };
 
