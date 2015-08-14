@@ -20,10 +20,10 @@ var validateEvent = function(req) {
         req.check(['flights', index, 'time'], "Must supply a valid time").notEmpty().isTime();
     });
     req.check('date', "A date later than today must be supplied").notEmpty().isFutureDate();
-    console.log('validation errors');
+    var errors = {};
     console.log(req.validationErrors());
-    console.log('-----');
-    return req.validationErrors(true);
+    req.validationErrors().forEach(function(err) {common.addErrorMessage(Array.isArray(err.param) ? err.param : [ err.param ], err, errors)});
+     return errors;
 };
 
 

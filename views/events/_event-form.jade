@@ -2,17 +2,20 @@ mixin _event-form(event, errors)
    if event._id
       input(type="hidden", name="_id", value= event._id)
    if errors.name
-      .error
-         = errors.name.msg
+     each err in errors.name
+         .error
+            = err.msg
    label event name
       input(type="text", name="name", value= event.name, required)
    if errors.date
-      .error
-         = errors.date.msg
+     each err in errors.date
+        .error
+            =err.msg
    label Event Date
       input(type="date", name="date", class="datepicker", value= event.date, required)
    if errors.location
-      .error
-         = errors.location.msg
+     each err in errors.location
+        .error
+            err.msg
    label Event Location
       input(type="text", name="location", value= event.location, required)

@@ -1,4 +1,4 @@
-aem = require('../common/addErrorMessage.js');
+aem = require('../routes/common.js');
 
 describe('addErrorMessage', function() {
 
