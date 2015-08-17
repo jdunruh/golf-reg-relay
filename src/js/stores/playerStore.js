@@ -5,9 +5,11 @@ var appConstants = require('../constants/appConstants');
 var objectAssign = require('react/lib/Object.assign');
 var EventEmitter = require('events').EventEmitter;
 var $ = require('jquery');
+var metaphone = require('metaphone');
 
 
 var currentPlayer = im.Map();
+var store = im.List();
 
 var resetStore = function() {
     currentPlayer = new im.Map();
@@ -19,12 +21,31 @@ var getInitialDataFromServer = function () {
         method: "get",
         url: window.location.origin + "/api/getCurrentUser",
         timeout: 3000
-    }).done(function (data) {
-            currentPlayer = new im.Map(data);
-        }
-    ).fail(function () {
-            alert("Initial Data Pull Failed. Try again later.")
+    }).then(function (data) {
+        currentPlayer = new im.Map(data);
+        return $.ajax({
+            dataType: "json",
+            method: "get",
+            url: window.location.origin + "/api/getAllPlayers",
+            timeout: 3000
         })
+    }).then(function (data) {
+        store = im.fromJS(data);
+        // add metaphone version of name for faster searching
+        store = store.map((el) => el.set("metaphone-full" , metaphone(el.get("name"))))
+    }).fail(function () {
+        alert("Initial Player Data Pull Failed. Try again later.")
+    })
+};
+
+var getOptionList = function(inputValue) {
+    var mp = metaphone(inputValue);
+    var len = mp.length;
+    var ivLen = inputValue.length;
+    return store.filter(function(el){
+              return mp === el.get('metaphone-full').substring(0, len) ||
+               inputValue === el.get('name').substring(0, ivLen);
+    })
 };
 
 
@@ -43,13 +64,21 @@ AppDispatcher.register(function(payload){
     }
 });
 
+var playerStore = objectAssign({}, EventEmitter.prototype, {
+    addChangeListener: function (cb) {
+        this.on(appConstants.CHANGE_EVENT, cb);
+    },
+    removeChangeListener: function (cb) {
+        this.removeListener(appConstants.CHANGE_EVENT, cb);
+    },
 
-
-module.exports = {
     getCurrentPlayerName: getCurrentPlayerName,
     resetStore: resetStore,
-    getInitialDataFromServer: getInitialDataFromServer
-};
+    getInitialDataFromServer: getInitialDataFromServer,
+    getOptionList: getOptionList
+});
+
+module.exports = playerStore;
 
 
 

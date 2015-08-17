@@ -2,8 +2,14 @@ var mongoose = require('mongoose');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
-var flightSchema = new mongoose.Schema(
-    {time: {type: Date, required: true},
+var golferSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    id: {type: ObjectId, required: true},
+    added_by: {type: ObjectId, required: true}
+});
+
+var flightSchema = new mongoose.Schema({
+    time: {type: Date, required: true},
     maxPlayers: {type: Number, required: true},
     players:[ String ]
 });

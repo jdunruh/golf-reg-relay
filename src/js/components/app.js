@@ -4,14 +4,8 @@ var React = require('react');
 var eventStore = require('../stores/eventStore');
 var playerStore = require('../stores/playerStore');
 var actions = require('../actions/eventActions');
+var Typeahead = require('react-typeahead-component');
 
-/*
-var flight1 = eventStore.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
-var flight2 = eventStore.newFlight(2, "10:26", im.Set(["Tommy", "Annie"]));
-var flight3 = eventStore.newFlight(4, "10:32", im.Set([]));
-eventStore.resetStore();
-eventStore.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
-*/
 
 var generateSelect = function (event, value, changeFn, player) {
     if (utils.availableFlights(event.get("flights")).count() === 0) {
@@ -68,6 +62,90 @@ function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initi
 }
 
 
+
+var OptionTemplate = React.createClass({
+    displayName: 'OptionTemplate',
+
+    propTypes: {
+        data: React.PropTypes.any,
+        inputValue: React.PropTypes.string,
+        isSelected: React.PropTypes.bool
+    },
+
+    render: function() {
+        var classes =
+            'yt-option' + this.props.selected ? 'yt-selected-option' : '';
+
+        return (
+            <div className={classes}>
+                {this.renderOption()}
+            </div>
+        );
+    },
+
+    renderOption: function() {
+        var optionData = this.props.data.name,
+            inputValue = this.props.userInputValue;
+
+        if (optionData.indexOf(inputValue) === 0) {
+            return (
+                <span>
+                    {inputValue}
+                    <strong>
+                        {optionData.slice(inputValue.length)}
+                    </strong>
+                </span>
+            );
+        }
+
+        return optionData;
+    }
+});
+var TypeAheadWidget = React.createClass({
+    getInitialState: function() {return {options: [], inputValue: this.props.player}},
+
+    _onChange: function() {
+        this.setState({options: this.getOptions(this.state.inputValue)});
+    },
+
+    componentDidMount: function() { playerStore.addChangeListener(this._onChange)},
+
+    componentWillUnmount: function() {playerStore.removeChangeListner(this._onChange)},
+
+    handleChange: function(event) {
+        var value = event.target.value;
+        this.setInputValue(value);
+        this.setState({options: this.getOptions(value)});
+    },
+
+    getOptions: (inputValue) => playerStore.getOptionList(inputValue).toJS(),
+
+    handleOptionChange: function(event, option) {
+        this.setInputValue(option.name);
+    },
+
+    handleOptionClick: function(event, option) {
+        this.setInputValue(option.name);
+    },
+
+    setInputValue: function(value) {
+        this.setState({
+            inputValue: value
+        });
+    },
+
+    render: function() {
+       return  <Typeahead
+           inputValue={this.state.inputValue}
+           options={this.state.options}
+           onChange={this.handleChange}
+           onOptionChange={this.handleOptionChange}
+           onOptionClick={this.handleOptionClick}
+           optionTemplate={OptionTemplate}
+            />
+    }
+});
+
 var TimeSelector = React.createClass({
     getInitialState: function () { // need position (index) of first possible flight time
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
@@ -93,6 +171,7 @@ var TimeSelector = React.createClass({
     render: function () {
         return ( <form>
             {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove)}
+            <TypeAheadWidget player={ this.props.player }/>
         </form>);
     }
 });

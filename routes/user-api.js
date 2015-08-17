@@ -4,29 +4,27 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var common = require('./common');
-
+var persist = require('../persist');
+var csp = require('js-csp');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 
 var events = require('../models/event-model');
+var players = require('../models/player-model');
 
-
-
-// seed database for testing purposes
-/*var eventTestData = {
-    date: 'Tuesday',
-    location: 'Fossil Trace',
-    flights: [
-        {time: "10:20", players: ["Harry", "Sally", "Morrie"], maxPlayers: 4},
-        {maxPlayers: 2, time: "10:26", players: ["Tommy", "Annie"]},
-        {maxPlayers: 4, time: "10:32", players: []}]
+var getAllPlayers = function(res) {
+    csp.go(function*() {
+        var result = yield csp.take(persist.getAll(players.Player));
+        if(result instanceof Error)
+            res.status(404);
+        else {
+            console.log(result);
+            res.status(200).json(result);
+        }
+    })
 };
 
-var event = new events.Event(eventTestData);
 
-events.Event.remove({}, function(err, result) {
-    event.save();
-});*/
 
 
 router.get('/getAllEVents', function(req, res, next) {
@@ -86,6 +84,10 @@ router.patch('/movePlayer/', function(req, res, next) {
 
 router.get('/getCurrentUser', function(req, res, next) {
     res.status(200).json({name: req.user.name, id: req.user._id})
+});
+
+router.get('/getAllPlayers', function(req, res, next) {
+    getAllPlayers(res);
 });
 
 
