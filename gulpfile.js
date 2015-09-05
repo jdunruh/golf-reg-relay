@@ -27,7 +27,8 @@ var path = {
     CLIENT_OUT: 'app.js',
     SERVER_OUT: 'server.js',
     CSS_SRC: './src/scss/*.scss',
-    CSS_ENTRY: './src/scss/app.scss'
+    CSS_ENTRY: './src/scss/app.scss',
+    UI_CSS_ENTRY: './src/scss/user.scss'
 };
 
 gulp.task('copy', function(){
@@ -37,6 +38,8 @@ gulp.task('copy', function(){
 
 gulp.task('watch', function() {
     gulp.watch(path.HTML, ['copy']);
+
+    gulp.watch(path.CSS_SRC, ['sass']);
 
     var watcher  = watchify(browserify({
         entries: [path.ENTRY_POINT],
@@ -87,7 +90,7 @@ var allSpecFiles = function(dir) {
 gulp.task('build', function(){
     browserify({
         entries: [path.ENTRY_POINT],
-        transform: [babelify],
+        transform: [babelify]
     })
         .bundle()
         .pipe(source(path.MINIFIED_OUT))
@@ -104,13 +107,13 @@ gulp.task('replaceHTML', function(){
 });
 
 gulp.task('sass', function () {
-    gulp.src('pth.CSS_ENTRY')
+    gulp.src('path.CSS_ENTRY')
+        .pipe(sass().on('error', console.log('sass compilation error')))
+        .pipe(gulp.dest(path.DEST_CSS));
+    gulp.src('path.UI_CSS_ENTRY')
         .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest(path.DEST_CSS));
-});
 
-gulp.task('sass:watch', function () {
-    gulp.watch(path.CSS_SRC);
 });
 
 

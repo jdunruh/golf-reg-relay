@@ -85,6 +85,18 @@ module.exports = {
         });
         return ch;
     },
+    getAllPlayersNameAndId: function(model) {
+        var ch = csp.chan();
+        model.find({}, {name:1}, function(err, players) {
+            if(err)
+                csp.putAsync(ch, err);
+            else {
+                csp.putAsync(ch, players);
+                console.log(players);
+            }
+        });
+        return ch;
+    },
     getPlayerByToken: function(model,token) {
         var ch = csp.chan();
         model.find({resetToken: token}, function(err, docs) {

@@ -1,9 +1,11 @@
+require('babel/polyfill');
 var im = require('immutable');
 var utils = require('../common/utils');
 var React = require('react');
 var eventStore = require('../stores/eventStore');
 var playerStore = require('../stores/playerStore');
 var actions = require('../actions/eventActions');
+var playerActions = require('../actions/playerActions');
 var Typeahead = require('react-typeahead-component');
 
 
@@ -12,7 +14,7 @@ var generateSelect = function (event, value, changeFn, player) {
         return null;
     } else { // list of options containing only those flights with room for more players
         var selectList = utils.findTimes(event, player).map(el =>
-            <option key={el.get("index")} value={el.get("index")}>{el.get("time")}</option>);
+            <option key={el.get("time")} value={el.get("index")}>{el.get("time")}</option>);
         return <select className="time-select" name="time" value={ value }
                                 onChange={changeFn}> { selectList } </select>;
     }
@@ -27,7 +29,7 @@ function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initi
                <span>
                    <button className="btn" onClick={addFn}>Add Me At</button>
                    <div>
-                       {generateSelect(event, player, changeFn, initialSelectVal)}
+                       {generateSelect(event, initialSelectVal, changeFn, player)}
                    </div>
                </span>
            </div>
@@ -52,7 +54,7 @@ function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initi
                     <span>
                         <button className="btn" onClick={moveFn}>Move Me To</button>
                         <div>
-                            {generateSelect(event, player, changeFn, initialSelectVal)}
+                            {generateSelect(event, initialSelectVal, changeFn, player)}
                         </div>
                     </span>
                 </div>
@@ -102,7 +104,7 @@ var OptionTemplate = React.createClass({
     }
 });
 var TypeAheadWidget = React.createClass({
-    getInitialState: function() {return {options: [], inputValue: this.props.player}},
+    getInitialState: function() {return {options: [], inputValue: this.props.player.get('name')}},
 
     _onChange: function() {
         this.setState({options: this.getOptions(this.state.inputValue)});
@@ -110,7 +112,7 @@ var TypeAheadWidget = React.createClass({
 
     componentDidMount: function() { playerStore.addChangeListener(this._onChange)},
 
-    componentWillUnmount: function() {playerStore.removeChangeListner(this._onChange)},
+    componentWillUnmount: function() {playerStore.removeChangeListener(this._onChange)},
 
     handleChange: function(event) {
         var value = event.target.value;
@@ -129,9 +131,21 @@ var TypeAheadWidget = React.createClass({
     },
 
     setInputValue: function(value) {
-        this.setState({
-            inputValue: value
-        });
+        this.setState({inputValue: value});
+    },
+
+    setCurrentPlayer: function() {
+        var player = this.state.options.find((player) => player.name  === this.state.inputValue)
+        if(player)
+            playerActions.updateCurrentPlayer(this.state.inputValue);
+    },
+
+    handleHint: function() {
+        if (this.state.options.length > 0 && new RegExp('^' + this.state.inputValue).test(this.state.options[0].name)) {
+            return this.state.options[0].name;
+        }
+        else
+            return '';
     },
 
     render: function() {
@@ -142,6 +156,8 @@ var TypeAheadWidget = React.createClass({
            onOptionChange={this.handleOptionChange}
            onOptionClick={this.handleOptionClick}
            optionTemplate={OptionTemplate}
+           onBlur={this.setCurrentPlayer}
+           handleHint={this.handleHint}
             />
     }
 });
@@ -150,10 +166,10 @@ var TimeSelector = React.createClass({
     getInitialState: function () { // need position (index) of first possible flight time
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
-    componentWillReceiveProps: function(nextProps) {
-        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
+    componentWillReceiveProps: function(nextProps) { // here timeSelect is the index of the first select value
+        //this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
-    handleSelectChange: function (e) {
+    handleSelectChange: function (e) { // not clear what timeSelect should be - the whole selector or the selected value
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function (e) {
@@ -168,9 +184,9 @@ var TimeSelector = React.createClass({
         e.preventDefault();
         actions.movePlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
     },
-    render: function () {
+    render: function () { // timeselect last param not used.
         return ( <form>
-            {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove)}
+            {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove, this.handleSelectChange, this.state.timeSelect)}
             <TypeAheadWidget player={ this.props.player }/>
         </form>);
     }
@@ -180,7 +196,7 @@ var TeeTime = React.createClass({
     render: function () {
         var players = this.props.timeData.get("players").map(function (el, index) {
             return (<tr className="player" key={index}>
-                <td>{el}</td>
+                <td>{el.get('name')}</td>
             </tr>)
         });
         return (
@@ -226,7 +242,7 @@ var TeeTimeTable = React.createClass({
     },
     render: function () {
         return ( <div id="tee-time-table" className="form-box">
-            <TimeSelector event={ this.state.events.get(0) } player={ playerStore.getCurrentPlayerName() }/>
+            <TimeSelector event={ this.state.events.get(0) } player={ playerStore.getCurrentPlayer() }/>
             <TeeTimeList teeTimes={ this.state.events.get(0).get("flights") }/>
         </div>)
     }

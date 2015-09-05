@@ -4,14 +4,14 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 
 var golferSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    id: {type: ObjectId, required: true},
-    added_by: {type: ObjectId, required: true}
+    golferId: {type: ObjectId, required: true},
+    addedBy: {type: ObjectId, required: true}
 });
 
 var flightSchema = new mongoose.Schema({
     time: {type: Date, required: true},
     maxPlayers: {type: Number, required: true},
-    players:[ String ]
+    players:[ golferSchema ]
 });
 
 

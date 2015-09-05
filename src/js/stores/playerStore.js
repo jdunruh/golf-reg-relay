@@ -9,10 +9,13 @@ var metaphone = require('metaphone');
 
 
 var currentPlayer = im.Map();
+var loggedInPlayer = im.Map();
 var store = im.List();
 
 var resetStore = function() {
     currentPlayer = new im.Map();
+    loggedInPlayer = currentPlayer;
+    store = im.List();
 };
 
 var getInitialDataFromServer = function () {
@@ -23,6 +26,7 @@ var getInitialDataFromServer = function () {
         timeout: 3000
     }).then(function (data) {
         currentPlayer = new im.Map(data);
+        loggedInPlayer = currentPlayer;
         return $.ajax({
             dataType: "json",
             method: "get",
@@ -53,11 +57,25 @@ var getCurrentPlayerName = function() {
     return currentPlayer.get('name');
 };
 
+var getCurrentPlayer = function() {
+    return currentPlayer;
+};
+
+var getLoggedInPlayerName = function() {
+    return loggedInPlayer.get('name');
+};
+
+var updateCurrentPlayer = function(playerName) {
+    var newPlayer = store.find((el) => el.name === playerName);
+    newPlayer = newPlayer || {name: playerName, _id: 0}; // TODO - persist player to DB
+    currentPlayer = newPlayer;
+};
+
 AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
-        case appConstants.FIND_CURRENT_PLAYER:
-            findCurrentPlayer();
+        case appConstants.UPDATE_CURRENT_PLAYER:
+            updateCurrentPlayer(payload.data);
             break;
         default:
             return true;
@@ -73,6 +91,7 @@ var playerStore = objectAssign({}, EventEmitter.prototype, {
     },
 
     getCurrentPlayerName: getCurrentPlayerName,
+    getCurrentPlayer: getCurrentPlayer,
     resetStore: resetStore,
     getInitialDataFromServer: getInitialDataFromServer,
     getOptionList: getOptionList

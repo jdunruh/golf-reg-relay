@@ -42,12 +42,20 @@ var getInitialDataFromServer = function (cb) {
         url: window.location.origin + "/api/getAllEvents",
         timeout: 3000
     }).done(function (data) {
-            store = new im.Map({organization: "Up the Creek Ski and Rec Club", events: fromJSCustom(data)});
-            cb();
-        }
-    ).fail(function () {
+        store = new im.Map({organization: "Up the Creek Ski and Rec Club", events: fromJSCustom(data)});
+        store = store.update('events', function (events) {
+            return events.map(function (event) {
+                return event.update('flights', function (flights) {
+                    return flights.map(function (flight, idx) {
+                        return flight.set('index', idx)
+                    });
+                });
+            });
+        });
+        cb();
+    }).fail(function () {
             alert("Initial Data Pull Failed. Try again later.")
-        })
+        });;
 };
 
 

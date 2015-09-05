@@ -86,8 +86,16 @@ router.get('/getCurrentUser', function(req, res, next) {
     res.status(200).json({name: req.user.name, id: req.user._id})
 });
 
-router.get('/getAllPlayers', function(req, res, next) {
-    getAllPlayers(res);
+router.get('/getAllPlayers', function (req, res, next) {
+    csp.go(function*() {
+        result = yield csp.take(persist.getAllPlayersNameAndId(players.Player)); // don't send password, etc to client
+        if (result instanceof Error)
+            res.status(500).json(result);
+        else {
+            console.log(result);
+            res.status(200).json(result);
+        }
+    });
 });
 
 
