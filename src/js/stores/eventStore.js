@@ -87,6 +87,7 @@ var addPlayer = function(event, flight, player) {
     $.ajax({
         dataType: "json",
         method: "put",
+        contentType: "application/json",
         url: window.location.origin + "/api/addPlayer",
         data: JSON.stringify({event: store.getIn(["events", event, "_id"]), flight: flight, player: player}),
         timeout: 3000

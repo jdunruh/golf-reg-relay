@@ -1,4 +1,4 @@
-/* API for the react UI */
+
 
 var express = require('express');
 var router = express.Router();
@@ -52,6 +52,7 @@ router.delete('/removeModel/', function(req, res, next) {
 
 router.put('/addPlayer/', function(req, res, next) {
     var update = {$addToSet: {}}; // need to validate that the flight is legal
+    req.body.player['addedBy'] = req.user._id
     update['$addToSet']["flights." + req.body.flight + ".players"] = req.body.player;
     events.Event.update({_id: req.body.event}, update, function(err, docs) {
         if(err) {
