@@ -67,15 +67,15 @@ var getLoggedInPlayerName = function() {
 
 var updateCurrentPlayer = function(playerName) {
     var newPlayer = store.find((el) => el.name === playerName);
-    newPlayer = newPlayer || {name: playerName, _id: 0}; // TODO - persist player to DB
-    currentPlayer = newPlayer;
+    currentPlayer = newPlayer || im.Map({name: playerName}); // TODO - persist player to DB
+    playerStore.emit(appConstants.CHANGE_EVENT);
 };
 
 AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
         case appConstants.UPDATE_CURRENT_PLAYER:
-            updateCurrentPlayer(payload.data);
+            updateCurrentPlayer(action.data);
             break;
         default:
             return true;

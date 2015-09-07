@@ -120,6 +120,10 @@ var TypeAheadWidget = React.createClass({
         this.setState({options: this.getOptions(value)});
     },
 
+    onComplete(event, completedInputValue) {
+        this.setInputValue(completedInputValue);
+    },
+
     getOptions: (inputValue) => playerStore.getOptionList(inputValue).toJS(),
 
     handleOptionChange: function(event, option) {
@@ -131,6 +135,7 @@ var TypeAheadWidget = React.createClass({
     },
 
     setInputValue: function(value) {
+        playerActions.updateCurrentPlayer(value);
         this.setState({inputValue: value});
     },
 
@@ -156,7 +161,7 @@ var TypeAheadWidget = React.createClass({
            onOptionChange={this.handleOptionChange}
            onOptionClick={this.handleOptionClick}
            optionTemplate={OptionTemplate}
-           onBlur={this.setCurrentPlayer}
+//           onBlur={this.setCurrentPlayer}
            handleHint={this.handleHint}
             />
     }
@@ -236,9 +241,11 @@ var TeeTimeTable = React.createClass({
     },
     componentDidMount: function () {
         eventStore.addChangeListener(this._onChange);
+        playerStore.addChangeListener(this._onChange);
     },
     componentWillUnmount: function () {
         eventStore.removeChangeListener(this._onChange);
+        playerStore.removeChangeListener(this._onChange);
     },
     render: function () {
         return ( <div id="tee-time-table" className="form-box">
