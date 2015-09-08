@@ -72,8 +72,6 @@ var createAction = function(req, res, next) {
         convertEventDatesAndTimes(req.body);
         var event = new events.Event(req.body);
         event.filterStatus();
-        console.log(event);
-        console.log("persisting");
         csp.go(function*() {
             var result = yield csp.take(persist.saveModel(event));
             if (result instanceof Error)

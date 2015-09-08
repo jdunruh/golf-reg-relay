@@ -17,6 +17,7 @@ var playersRoute = require('./routes/players.js');
 var players = require('./models/player-model');
 var login = require('./routes/login');
 var events = require('./routes/events');
+var organizationsRoute = require('./routes/organizations');
 var expressValidator = require('express-validator');
 var session = require('express-session');
 var users = require('./routes/users');
@@ -100,6 +101,7 @@ app.use('/users', users);
 app.use('/players', playersRoute);
 app.use('/events', events);
 app.use('/', login);
+app.use('/organizations', organizationsRoute);
 
 
 // catch 404 and forward to error handler

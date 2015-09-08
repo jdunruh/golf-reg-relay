@@ -1,0 +1,10 @@
+mixin _organization-form(event, errors)
+   if organization._id
+      input(type="hidden", name="_id", value= organization._id)
+   if errors.name
+     each err in errors.name
+         .error
+            = err.msg
+   label organization name
+      input(type="text", name="name", value= organization.name, required)
+

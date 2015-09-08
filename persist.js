@@ -18,11 +18,8 @@ module.exports = {
         return ch;
     },
     updateModel: function (model, input) { // channel gets player structure with _id and any fields to update
-        console.log(input);
-        console.log("object id is " + input._id);
         var ch = csp.chan();
         model.findById(input._id, function(err, doc) {
-            console.log(doc);
             if (err)
                 csp.putAsync(err);
             else
@@ -114,8 +111,6 @@ module.exports = {
         var ch = csp.chan();
         model.save(function(err, result) {
             if(err) {
-                console.log("error leg in persist");
-                console.log(err);
                 csp.putAsync(ch, err);
             }
             else

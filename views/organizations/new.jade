@@ -1,0 +1,10 @@
+extends ../common/layout
+block title
+    title Add New Organization
+block content
+    h1 Add New Organization
+        form(action="/organizations" method="post")
+            include ./_organization-form
+            +_organization-form(organization, errors)
+            button(type="submit" class="btn") Create Event
+    a(href= "#{referrer}") Back
