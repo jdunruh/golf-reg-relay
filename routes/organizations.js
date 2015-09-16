@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var organizations = require('../models/organization-model');
 var persist = require('../persist');
 var csp = require('js-csp');
+var players = require('../models/player-model');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -16,8 +17,10 @@ router.get('/', function(req, res, next) {
         var result = yield csp.take(persist.getAll(organizations.Org));
         if( result instanceof Error) {
             res.status(404).send();
-        } else
-             res.render('organizations/index.jade', {organizations: result});
+        } else {
+            console.log('result');
+            res.render('organizations/index.jade', {organizations: result});
+        }
     });
 });
 
@@ -42,6 +45,8 @@ router.post('/', function (req, res, next) {
     else {
         var org = new organizations.Org(req.body);
         csp.go(function*() {
+            var overallOrg = yield csp.take(persist.findModelByQuery(players.Player, {name: "John Unruh"}));
+            org.organizers.push(overallOrg[0]._id);
             var result = yield csp.take(persist.saveModel(org));
             if (result instanceof Error) {
                 res.render('organizations/new.jade', {

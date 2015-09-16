@@ -107,9 +107,19 @@ module.exports = {
         return ch;
     },
     saveModel: function(model) {
-        console.log(model);
         var ch = csp.chan();
         model.save(function(err, result) {
+            if(err) {
+                csp.putAsync(ch, err);
+            }
+            else
+                csp.putAsync(ch, result);
+        });
+        return ch;
+    },
+    findModelByQuery: function(model, query) {
+        var ch = csp.chan();
+        model.find(query, function(err, result) {
             if(err) {
                 csp.putAsync(ch, err);
             }

@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var players = require('../models/player-model');
+var organizations = require('../models/organization-model');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -57,8 +58,15 @@ router.post('/', function (req, res, next) {
             name: req.body.name,
             registered: req.body.registered
         });
-        player.save(function (err) {
-            if (err) {
+        organizations.Org.find({name: 'Up the Creek Ski and Recreation Club'})
+            .then(function (docs) {
+                player.organizations = [docs[0]._id];
+                return player.save()
+            })
+            .then(function () {
+                res.redirect(302, '/players')
+            }
+            , function (err) {
                 res.render('players/new.jade', {
                     player: {
                         email: submittedEmail,
@@ -67,10 +75,7 @@ router.post('/', function (req, res, next) {
                     },
                     errors: {email: {msg: "email address already in system"}}
                 })
-            } else {
-                res.redirect(302, '/players');
-            }
-        });
+            });
     }
 });
 
