@@ -79,3 +79,12 @@ describe("JSON Conversion - fromJSCustom", function() {
       expect(store.fromJSCustom(events.toJS()) === events)
    })
 });
+
+describe("removePlayerFromFlight", function() {
+    it("can remove a player", function() {
+        var fl1 = im.Map({maxPlayers: 4, players: im.Set([im.Map({name: 'abc', id:1234}), im.Map({name: 'def', id:2345})])});
+        var fl2 = im.Map({maxPlayers: 2, players: im.Set([im.Map({name: 'abc', id:1234})])});
+        var store = im.Map({events: im.List([im.Map({location: 'abc', flights: im.List([fl1, fl2])})])});
+        expect(store.removePlayerFromEvent(0, im.Map({name: 'abc', id: 1234}));
+    })
+});

@@ -6,11 +6,12 @@ var events = require('../models/event-model');
 var persist = require('../persist');
 var csp = require('js-csp');
 var common = require('./common.js');
+var organizations = require('../models/organization-model');
+var players = require('../models/player-model');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 var validateEvent = function(req) {
-    console.log(req.body);
     req.sanitize('name').trim();
     req.sanitize('location').trim();
     req.check('name', 'A name between 5 and 100 characters must be supplied').notEmpty().isLength(5, 100);
@@ -20,9 +21,13 @@ var validateEvent = function(req) {
         req.check(['flights', index, 'time'], "Must supply a valid time").notEmpty().isTime();
     });
     req.check('date', "A date later than today must be supplied").notEmpty().isFutureDate();
-    var errors = {};
-    console.log(req.validationErrors());
-    req.validationErrors().forEach(function(err) {common.addErrorMessage(Array.isArray(err.param) ? err.param : [ err.param ], err, errors)});
+    var errors = null;
+    if(req.validationErrors()) {
+        errors = {};
+        req.validationErrors().forEach(function (err) {
+            common.addErrorMessage(Array.isArray(err.param) ? err.param : [err.param], err, errors)
+        });
+    }
      return errors;
 };
 
@@ -66,21 +71,27 @@ var newAction = function(req, res) {
 var createAction = function(req, res, next) {
     var mappedErrors = validateEvent(req);
     if(mappedErrors) {
-        console.log(mappedErrors);
         res.render('events/new.jade', {event: req.body, errors: mappedErrors});
     } else {
         convertEventDatesAndTimes(req.body);
         var event = new events.Event(req.body);
         event.filterStatus();
-        console.log(event);
-        console.log("persisting");
         csp.go(function*() {
-            var result = yield csp.take(persist.saveModel(event));
-            if (result instanceof Error)
-                next(500, result);
-            else
-                res.redirect('/events');
-        })
+            var organization = yield csp.take(persist.findModelByQuery(organizations.Org, {name: "Up the Creek Ski and Recreation Club"}));
+            if (organization instanceof Error)
+                next(500, "Data is Inconsistent");
+            else {
+                event.organizations = [organization[0]._id];
+                organization[0].organizers.forEach(function(el) {
+                    event.organizers.push(el);
+                });
+                var result = yield csp.take(persist.saveModel(event));
+                if (result instanceof Error)
+                    next(500, result);
+                else
+                    res.redirect('/events');
+            }
+        });
     }
 };
 

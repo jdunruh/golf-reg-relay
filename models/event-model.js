@@ -20,7 +20,8 @@ var eventSchema = new mongoose.Schema({
     date: {type: Date, required: true},
     location: {type: String, required: true, trim: true},
     flights: [flightSchema],
-    organizations: [ObjectId]
+    organizations: [ObjectId],
+    organizers: [ObjectId]
 });
 
 eventSchema.methods.dateToDayString = function() {
@@ -59,6 +60,12 @@ eventSchema.methods.filterStatus = function() {
     })
 };
 
+eventSchema.pre('save', function(next) {
+    if(this.flights.map(el => el.players.length > el.maxPlayers).reduce((acc, el) => acc || el, false))
+        next(new Error('Flight overfilled'));
+    else
+        next();
+});
 
 
 var Event = mongoose.model('Event', eventSchema);

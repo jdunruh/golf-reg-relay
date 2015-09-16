@@ -172,7 +172,7 @@ var TimeSelector = React.createClass({
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
     componentWillReceiveProps: function(nextProps) { // here timeSelect is the index of the first select value
-        //this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
+        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
     handleSelectChange: function (e) { // not clear what timeSelect should be - the whole selector or the selected value
         this.setState({timeSelect: e.target.value})

@@ -1,0 +1,24 @@
+extends ../common/layout
+block title
+   title "Organizations List"
+block content
+   #content
+      h1 Organizations
+        table
+            thead
+                tr
+                    td Organization
+                    td
+                    td
+                    td
+            tbody
+                each organization in organizations
+                    tr
+                        td= organization.name
+                       td
+                            a(href="/organizations/#{organization._id}") Show Details
+                        td
+                            a(href="/organizations/#{organization._id}/edit") Edit
+                        td
+                            a(href="/organizations/#{organization.id}/delete", class="delete-link") Delete
+

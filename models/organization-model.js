@@ -11,5 +11,5 @@ var organizationSchema = new mongoose.Schema({
 
 
 module.exports = {
-    Org = new mongoose.model('Org', organizationSchema)
+    Org: mongoose.model('Org', organizationSchema)
 };

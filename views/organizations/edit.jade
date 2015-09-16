@@ -1,0 +1,10 @@
+extends ../common/layout
+block title
+   title Edit Organization
+block content
+   h1 Edit Organization
+      include _organization-form
+      form(action="/organizations/#{organization._id}", method="post")
+         +_organization-form(organization, errors)
+         button(type="submit" class="btn") Save Event
+   a(href= "#{referrer}") Back
