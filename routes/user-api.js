@@ -13,18 +13,6 @@ var events = require('../models/event-model');
 var players = require('../models/player-model');
 
 
-var getAllPlayers = function(res) {
-    csp.go(function*() {
-        var result = yield csp.take(persist.getAll(players.Player));
-        if(result instanceof Error)
-            res.status(404);
-        else {
-            console.log(result);
-            res.status(200).json(result);
-        }
-    })
-};
-
 // event - event object, flight - flight index into event.flights array, player - player being changed
 var authorizedEventUpdate = function(user, player) {
     console.log(user);
@@ -56,6 +44,18 @@ var findPlayerInFilght = function(flightPlayers, player) {
 
 var playerInFlight = function(flightPlayers, player) {
     return flightPlayers.some(el => el.name === player.name);
+};
+
+var getAllPlayers = function(res) {
+    csp.go(function*() {
+        var result = yield csp.take(persist.getAll(players.Player));
+        if(result instanceof Error)
+            res.status(404);
+        else {
+            console.log(result);
+            res.status(200).json(result);
+        }
+    })
 };
 
 
@@ -120,19 +120,6 @@ router.put('/addPlayer/', function(req, res, next) {
             }
         }
     });
-
-            /*
-                var update = {$addToSet: {}}; // need to validate that the flight is legal
-                req.body.player['addedBy'] = req.user._id;
-                update['$addToSet']["flights." + req.body.flight + ".players"] = req.body.player;
-                events.Event.update({_id: req.body.event}, update, function(err, docs) {
-                    if(err) {
-                        res.status(500).json(err);
-                    } else {
-                        res.status(200).json(docs);
-                    }
-                })
-            */
 });
 
 
