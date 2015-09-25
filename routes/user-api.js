@@ -7,6 +7,7 @@ var common = require('./common');
 var persist = require('../persist');
 var csp = require('js-csp');
 var ObjectId = mongoose.Schema.Types.ObjectId;
+var mailer = require('../mailer');
 
 
 var events = require('../models/event-model');
@@ -17,7 +18,7 @@ var players = require('../models/player-model');
 var authorizedEventUpdate = function(user, player) {
     console.log(user);
     console.log(player);
-        return player.id === user._id.toHexString() || player.addedBy === user._id.toHexString();
+        return player._id.equals(user._id) || player.addedBy.equals(user._id);
 };
 
 // see if arr1 and arr2 have an element in common
@@ -77,15 +78,21 @@ router.delete('/removeModel/', function (req, res, next) {
             res.status(404).json(event);
             return;
         }
-        if (!(authorizedEventUpdate(req.user, req.body.player))) {
-            res.status(500).json({error: "You can only cancel your time or the time of someone you added"});
-            return;
-        }
         if (!event.flights[req.body.flight]) {
             res.status(500).json({error: "no such flight"});
             return;
         }
-        event.flights[req.body.flight].players = removePlayerFromFlight(event.flights[req.body.flight].players, req.body.player);
+        // use .id virtual element to compare hex string to played._id, a hex string coming from JSON
+        var player = event.flights[req.body.flight].players.find(el => el.id === req.body.player._id);
+        if(!player) {
+            res.status(404).json({error: "player not found"});
+            return;
+        }
+        if (!(authorizedEventUpdate(req.user, player))) {
+            res.status(500).json({error: "You can only cancel your time or the time of someone you added"});
+            return;
+        }
+         event.flights[req.body.flight].players = removePlayerFromFlight(event.flights[req.body.flight].players, req.body.player);
         var result = yield csp.take(persist.saveModel(event));
         if (result instanceof Error) {
             res.status(500).json(result);
@@ -108,6 +115,7 @@ router.put('/addPlayer/', function(req, res, next) {
             }
             if (objectIdArrayMatch(event.organizations, req.user.organizations)) { // if player is in an org owning event
                 req.body.player.addedBy = req.user._id;
+                req.body.player.player_id = req.body.id;
                 event.flights[req.body.flight].players.push(req.body.player);
                 var result = yield csp.take(persist.saveModel(event));
                 if (result instanceof Error) {
@@ -138,7 +146,13 @@ router.patch('/movePlayer', function (req, res, next) {
             res.status(405).json({error: "Illegal from or to flight"});
             return;
         }
-        if(!(authorizedEventUpdate(req.user, req.body.player))) {
+        // use .id virtual element to compare hex string to played._id, a hex string coming from JSON
+        var player = event.flights[req.body.fromFlight].players.find(el => el.id === req.body.player._id);
+        if(!player) {
+            res.status(404).json({error: "player not found"});
+            return;
+        }
+        if(!(authorizedEventUpdate(req.user, player))) {
             res.status(405).json({error: "You can only move yourself or someone you added"});
             return;
         }
@@ -149,7 +163,7 @@ router.patch('/movePlayer', function (req, res, next) {
         if(event.flights[req.body.toFlight].players.length < event.flights[req.body.toFlight].maxPlayers)
             event.flights[req.body.toFlight].players.push(findPlayerInFilght(event.flights[req.body.fromFlight].players, req.body.player));
         else {
-            res.states(405).json({error: "flight is full"});
+            res.status(405).json({error: "flight is full"});
             return;
         }
         event.flights[req.body.fromFlight].players = removePlayerFromFlight(event.flights[req.body.fromFlight].players, req.body.player);
@@ -162,14 +176,37 @@ router.patch('/movePlayer', function (req, res, next) {
     });
 });
 
+router.post('/newPlayer', function (req, res) {
+    csp.go(function*() {
+        // get crypto random value for password. Login should be blocked anyway, but best to be sure
+        var pwd = yield csp.take(mailer.generateToken());
+        var player = {
+            name: req.body.name,
+            registered: false,
+            email: pwd,
+            password: pwd,
+            organizations: req.user.organizations,
+            addedBy: req.user._id
+        };
+        var result = yield csp.take(persist.newModel(players.Player, player));
+        if (result instanceof Error) {
+            res.status(500).json({error: "Cannot create player"});
+        } else {
+            var reply = {name: result.name, // don't send sensitive info to client
+                    _id: result._id};
+            res.status(200).json(reply);
+        }
+    })
+});
+
 
 router.get('/getCurrentUser', function(req, res, next) {
-    res.status(200).json({name: req.user.name, id: req.user._id})
+    res.status(200).json({name: req.user.name, _id: req.user._id})
 });
 
 router.get('/getAllPlayers', function (req, res, next) {
     csp.go(function*() {
-        result = yield csp.take(persist.getAllPlayersNameAndId(players.Player)); // don't send password, etc to client
+        var result = yield csp.take(persist.getAllPlayersNameAndId(players.Player)); // don't send password, etc to client
         if (result instanceof Error)
             res.status(500).json(result);
         else {

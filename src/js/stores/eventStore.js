@@ -12,7 +12,7 @@ var store = new im.Map({});
 // A little syntactic sugar to fill in the second arg needed
 // in the recursive function on the first call for the user
 var fromJSCustom = function(js) {
-    return fromJSCustom1(js, null)
+    return fromJSCustom1(js, null);
 };
 
 // players are represented as a Set, other JSON arrays represent Lists
@@ -55,7 +55,7 @@ var getInitialDataFromServer = function (cb) {
         cb();
     }).fail(function () {
             alert("Initial Data Pull Failed. Try again later.")
-        });;
+        });
 };
 
 
@@ -189,7 +189,8 @@ var eventStore = objectAssign({}, EventEmitter.prototype, {
     removeEventFromStore: removeEventFromStore,
     fromJSCustom: fromJSCustom,
     movePlayerToFlight: movePlayerToFlight,
-    getInitialDataFromServer: getInitialDataFromServer
+    getInitialDataFromServer: getInitialDataFromServer,
+    store: store
 });
 
 AppDispatcher.register(function(payload){

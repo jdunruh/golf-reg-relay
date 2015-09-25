@@ -7,6 +7,12 @@ var playerActions = {
             actionType: appConstants.UPDATE_CURRENT_PLAYER,
             data: player
         });
+    },
+    newPlayer: function(name) {
+        AppDispatcher.handleAction({
+            actionType: appConstants.NEW_PLAYER,
+            data: name
+        })
     }
 };
 

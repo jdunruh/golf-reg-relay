@@ -4,7 +4,7 @@ var utils = require('../common/utils');
 var React = require('react');
 var eventStore = require('../stores/eventStore');
 var playerStore = require('../stores/playerStore');
-var actions = require('../actions/eventActions');
+var eventActions = require('../actions/eventActions');
 var playerActions = require('../actions/playerActions');
 var Typeahead = require('react-typeahead-component');
 
@@ -154,7 +154,7 @@ var TypeAheadWidget = React.createClass({
     },
 
     render: function() {
-       return  <Typeahead
+        return  <Typeahead
            inputValue={this.state.inputValue}
            options={this.state.options}
            onChange={this.handleChange}
@@ -171,23 +171,35 @@ var TimeSelector = React.createClass({
     getInitialState: function () { // need position (index) of first possible flight time
         return {timeSelect: utils.findTimes(this.props.event, this.props.player).getIn([0, "index"])}
     },
+    componentDidMount: function() {
+        playerStore.addNewPlayerListener(this.handleNewPlayer);
+    },
+    componentWillUnmount: function() {
+        playerStore.removeNewPlayerListener(this.handleNewPlayer);
+    },
     componentWillReceiveProps: function(nextProps) { // here timeSelect is the index of the first select value
         this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
-    handleSelectChange: function (e) { // not clear what timeSelect should be - the whole selector or the selected value
+    handleSelectChange: function (e) {
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function (e) {
         e.preventDefault();
-        actions.removePlayer({event: 0, player: this.props.player});
+        eventActions.removePlayer({event: 0, player: this.props.player});
     },
     handleAdd: function (e) {
         e.preventDefault();
-        actions.addPlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
+        if(!this.props.player.get('_id'))
+            playerActions.newPlayer(this.props.player.get('name'));
+        else
+            eventActions.addPlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
+    },
+    handleNewPlayer: function() {
+        eventActions.addPlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect, event: 0});
     },
     handleMove: function (e) {
         e.preventDefault();
-        actions.movePlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
+        eventActions.movePlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect, event: 0});
     },
     render: function () { // timeselect last param not used.
         return ( <form>

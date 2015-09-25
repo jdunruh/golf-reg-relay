@@ -4,7 +4,7 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 
 var golferSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    id: {type: ObjectId, required: true},
+    _id: {type: ObjectId, required: true},
     addedBy: {type: ObjectId, required: true}
 });
 
