@@ -11,9 +11,9 @@ module.exports = {
         var myModel = new model(input);
         myModel.save(function (err, docs) {
             if (err)
-                csp.putAsync(channel, err);
+                csp.putAsync(ch, err);
             else
-                csp.putAsync(channel, docs);
+                csp.putAsync(ch, docs);
         });
         return ch;
     },
@@ -84,7 +84,7 @@ module.exports = {
     },
     getAllPlayersNameAndId: function(model) {
         var ch = csp.chan();
-        model.find({}, {name:1}, function(err, players) {
+        model.find({}, {name:1, _id:1}, function(err, players) {
             if(err)
                 csp.putAsync(ch, err);
             else {

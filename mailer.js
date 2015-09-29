@@ -37,9 +37,7 @@ module.exports = {
         console.log('generateToken');
         var ch = csp.chan();
         crypto.randomBytes(20, function(err, buf) {
-            console.log('ranbomBytes returned');
             csp.putAsync(ch,  buf.toString('hex'));
-            console.log('token written to channel')
         });
         return ch;
     },

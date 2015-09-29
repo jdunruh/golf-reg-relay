@@ -61,14 +61,25 @@ var getAllPlayers = function(res) {
 
 
 router.get('/getAllEVents', function(req, res, next) {
-    events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) { // get events sorted by date
-        if(err) {
+    /*   events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) { // get events sorted by date
+     if(err) {
+     res.status(404).json(err);
+     } else { // have good data. Sort events by date then flights by time and then convert date and time values for display
+     var events = common.convertEventDocumentsToDisplay(docs);
+     res.status(200).json(events);
+     }
+     })
+     */
+    csp.go(function* () {
+        var userEvents = yield csp.take(persist.findModelByQuery(events.Event, {organizations: {$in: req.user.organizations},
+            date: {$gt: new Date.UTC()}}));
+        if (userEvents instanceof Error) {
             res.status(404).json(err);
-        } else { // have good data. Sort events by date then flights by time and then convert date and time values for display
-             var events = common.convertEventDocumentsToDisplay(docs);
-             res.status(200).json(events);
+        } else {
+            var returnEvents = common.convertEventDocumentsToDisplay(userEvents);
+            res.status(200).json(returnEvents);
         }
-    })
+    });
 });
 
 router.delete('/removeModel/', function (req, res, next) {

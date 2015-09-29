@@ -7,7 +7,14 @@ var playerStore = require('../stores/playerStore');
 var eventActions = require('../actions/eventActions');
 var playerActions = require('../actions/playerActions');
 var Typeahead = require('react-typeahead-component');
+var moment = require('moment');
 
+import { Router, Route, Link } from 'react-router'
+import createBrowserHistory from 'history/lib/createBrowserHistory'
+
+var findIndexOfEvent = function(events, id) {
+    return events.findIndex(event => event.get('_id') === id);
+};
 
 var generateSelect = function (event, value, changeFn, player) {
     if (utils.availableFlights(event.get("flights")).count() === 0) {
@@ -140,7 +147,7 @@ var TypeAheadWidget = React.createClass({
     },
 
     setCurrentPlayer: function() {
-        var player = this.state.options.find((player) => player.name  === this.state.inputValue)
+        var player = this.state.options.find((player) => player.name  === this.state.inputValue);
         if(player)
             playerActions.updateCurrentPlayer(this.state.inputValue);
     },
@@ -178,28 +185,36 @@ var TimeSelector = React.createClass({
         playerStore.removeNewPlayerListener(this.handleNewPlayer);
     },
     componentWillReceiveProps: function(nextProps) { // here timeSelect is the index of the first select value
-        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
+        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])}) // TODO - is this 0 correct?
     },
     handleSelectChange: function (e) {
         this.setState({timeSelect: e.target.value})
     },
     handleRemove: function (e) {
         e.preventDefault();
-        eventActions.removePlayer({event: 0, player: this.props.player});
+        var events = eventStore.getEventsFromStore();
+        eventActions.removePlayer({event: findIndexOfEvent(events, this.props.params.id),
+            player: this.props.player});
     },
     handleAdd: function (e) {
         e.preventDefault();
+        var events = eventStore.getEventsFromStore();
         if(!this.props.player.get('_id'))
             playerActions.newPlayer(this.props.player.get('name'));
         else
-            eventActions.addPlayer({player: this.props.player, flight: this.state.timeSelect, event: 0});
+            eventActions.addPlayer({player: this.props.player, flight: this.state.timeSelect,
+                event: findIndexOfEvent(events, this.props.params.id)})
     },
     handleNewPlayer: function() {
-        eventActions.addPlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect, event: 0});
+        var events = eventStore.getEventsFromStore();
+        eventActions.addPlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect,
+            event: findIndexOfEvent(events, this.props.params.id)})
     },
     handleMove: function (e) {
         e.preventDefault();
-        eventActions.movePlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect, event: 0});
+        var events = eventStore.getEventsFromStore();
+        eventActions.movePlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect,
+            event: findIndexOfEvent(events, this.props.params.id)})
     },
     render: function () { // timeselect last param not used.
         return ( <form>
@@ -261,16 +276,42 @@ var TeeTimeTable = React.createClass({
     },
     render: function () {
         return ( <div id="tee-time-table" className="form-box">
-            <TimeSelector event={ this.state.events.get(0) } player={ playerStore.getCurrentPlayer() }/>
-            <TeeTimeList teeTimes={ this.state.events.get(0).get("flights") }/>
+            <TimeSelector event={ this.state.events.get(findIndexOfEvent(this.state.events, this.props.params.id)) }
+                          player={ playerStore.getCurrentPlayer() }
+                          params= {this.props.params }/>
+            <TeeTimeList teeTimes={ this.state.events.get(findIndexOfEvent(this.state.events, this.props.params.id)).get("flights") }/>
         </div>)
+    }
+});
+
+const EventListItem = React.createClass({
+    render: function() {
+        var dest = "/signup/" + this.props.event.get('_id');
+        return <li className="event-select-item" >
+            <Link to={dest}>{this.props.event.get('name')}&nbsp;{this.props.event.get('location')}&nbsp;{this.props.event.get('date')}</Link></li>
+    }
+});
+
+const SelectEvent = React.createClass({
+    render:  function() {
+        var eventList = eventStore.getEventsFromStore()
+            .map(event => <EventListItem event={event} key={event.get('_id')}/>);
+        return (<div className="scroll-box"> <ul className="pick-list">
+                { eventList }
+            </ul>
+            </div>
+        )
     }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
     playerStore.getInitialDataFromServer();
     eventStore.getInitialDataFromServer(function() {
-        React.render(<TeeTimeTable />, document.getElementById('container'));
+        React.render((
+            <Router history={createBrowserHistory()}>
+                <Route path="/" component={SelectEvent} />
+                <Route path="/signup/:id" component={TeeTimeTable}  />
+            </Router>), document.getElementById('container'));
     });
 });
 

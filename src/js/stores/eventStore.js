@@ -124,7 +124,7 @@ var removePlayerFromEvent = function (event, player) {
 };
 
 var removePlayer = function(event, player) {
-    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").some(el => el.get('name') === player.get('name')));
+    var flight  = store.getIn(["events", event, "flights"]).findEntry(x => x.get("players").some(el => el.get('name') === player.get('name')));
     $.ajax({
         dataType: "json",
         contentType: "application/json",
@@ -147,7 +147,7 @@ var removeEventFromStore = function(event) {
 };
 
 var movePlayer = function(event, player, toFlight) {
-    var flight  = store.getIn(["events", 0, "flights"]).findEntry(x => x.get("players").some(el => el.get('name') === player.get('name')));
+    var flight  = store.getIn(["events", event, "flights"]).findEntry(x => x.get("players").some(el => el.get('name') === player.get('name')));
     $.ajax({
         dataType: "json",
         contentType: "application/json",
@@ -165,11 +165,13 @@ var movePlayer = function(event, player, toFlight) {
 
 // move a player from an existing flight to a new flight
 var movePlayerToFlight = function(event, player, flight) {
-    if(!utils.flightFull(store.getIn(["events", 0, "flights", flight]))) {
+    if(!utils.flightFull(store.getIn(["events", event, "flights", flight]))) {
         removePlayerFromEvent(event, player);
         addPlayerToFlight(event, flight, player);
     }
 };
+
+
 
 var eventStore = objectAssign({}, EventEmitter.prototype, {
     addChangeListener: function(cb){
