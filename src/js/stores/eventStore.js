@@ -53,8 +53,9 @@ var getInitialDataFromServer = function (cb) {
             });
         });
         cb();
-    }).fail(function () {
-            alert("Initial Data Pull Failed. Try again later.")
+    }).fail(function (err) {
+            console.log(err);
+            alert("Initial Data Pull Failed. Try again later.");
         });
 };
 

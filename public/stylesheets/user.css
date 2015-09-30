@@ -64,4 +64,15 @@ html {
 .yt-selected-option {
   background-color: #eee; }
 
+.scroll-box {
+  height: 120px;
+  width: 120px;
+  overflow: auto; }
+
+.pick-list {
+  list-style-type: none; }
+
+.event-link {
+  font-weight: bold; }
+
 /*# sourceMappingURL=user.css.map */

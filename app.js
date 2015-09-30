@@ -73,15 +73,6 @@ app.use(expressValidator({
 ));
 
 
-//app.use(cookieParser());
-/*
-app.use(cookieSession({
-    name: 'session',
-    keys: [process.env.SESSION_KEY_1, process.env.SESSION_KEY_2, process.env.SESSION_KEY_3, process.env.SESSION_KEY_4],
-    signed: true,
-    secureProxy: false
-}));
-*/
 app.use(flash());
 
 passport.serializeUser(function(player, done) {
@@ -102,6 +93,10 @@ app.use('/players', playersRoute);
 app.use('/events', events);
 app.use('/', login);
 app.use('/organizations', organizationsRoute);
+app.get('*', function(request, response){
+    response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+});
+
 
 
 // catch 404 and forward to error handler

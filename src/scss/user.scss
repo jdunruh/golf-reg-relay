@@ -79,4 +79,19 @@ html {
   background-color: #eee;
 }
 
+.scroll-box {
+  height: 120px;
+  width: 120px;
+  overflow: auto;
+  $background-color: $background;
+}
+
+.pick-list{
+  list-style-type: none;
+}
+
+.event-link {
+  font-weight: bold;
+}
+
 

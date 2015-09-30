@@ -72,7 +72,7 @@ router.get('/getAllEVents', function(req, res, next) {
      */
     csp.go(function* () {
         var userEvents = yield csp.take(persist.findModelByQuery(events.Event, {organizations: {$in: req.user.organizations},
-            date: {$gt: new Date.UTC()}}));
+            date: {$gt: new Date()}}));
         if (userEvents instanceof Error) {
             res.status(404).json(err);
         } else {

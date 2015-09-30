@@ -9,7 +9,7 @@ var playerActions = require('../actions/playerActions');
 var Typeahead = require('react-typeahead-component');
 var moment = require('moment');
 
-import { Router, Route, Link } from 'react-router'
+import { Router, Route, Link, History } from 'react-router'
 import createBrowserHistory from 'history/lib/createBrowserHistory'
 
 var findIndexOfEvent = function(events, id) {
@@ -288,15 +288,26 @@ const EventListItem = React.createClass({
     render: function() {
         var dest = "/signup/" + this.props.event.get('_id');
         return <li className="event-select-item" >
-            <Link to={dest}>{this.props.event.get('name')}&nbsp;{this.props.event.get('location')}&nbsp;{this.props.event.get('date')}</Link></li>
+                <div className="event-link"><Link to={dest}>{this.props.event.get('name')}</Link></div>
+                <div>{this.props.event.get('location')}</div>
+                <div>{this.props.event.get('date')}</div>
+            </li>
     }
 });
 
 const SelectEvent = React.createClass({
+    mixins: [History],
+    componentWillMount: function() {
+        var events = eventStore.getEventsFromStore();
+        if(events.size == 1) {
+            var eventID = events.getIn([0, '_id']);
+            this.history.replaceState(null, '/signup/' + eventID);
+        }
+    },
     render:  function() {
         var eventList = eventStore.getEventsFromStore()
             .map(event => <EventListItem event={event} key={event.get('_id')}/>);
-        return (<div className="scroll-box"> <ul className="pick-list">
+        return (<div className="form-box"> <ul className="pick-list">
                 { eventList }
             </ul>
             </div>
