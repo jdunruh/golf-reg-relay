@@ -53,6 +53,44 @@ var indexAction = function(req, res, next) {
     })
 };
 
+/* logged in user allowed to see event if the user is an organizer for the event
+or if the user is an organizer for an organization sponsoring the event
+ */
+var filterEvents = function(event, organization, user) {
+
+};
+
+var addScope = function(andOr, scope, query) {
+    if(andOr === "and") {
+        var updatedQuery = query;
+        for(key in scope) {
+            updatedQuery[key] = scope[key];
+        }
+        return updatedQuery;
+    } else {
+        return {$or: [query, scope]};
+    }
+};
+
+var getAllowedEvents= function(user, event_id) {
+    csp.go(function*() {
+        var eventQuery;
+        var orgs = csp.take(persist.findModelByQuery(organizations.Org, {organizers: {$in: [user._id]}}));
+        if(orgs instanceof Error) {
+            return orgs;
+        }
+        var orgIds = orgs.map(org => org._id); // project _id
+        if(event_id) // optional and argument to match on an event_id
+            eventQuery = {event: event_id};
+        else
+            eventQuery = {};
+        eventQuery['$or:'] = [{organizers: {$in: [user._id]}},
+            {organizations: {$in: orgIds}}];
+        var events = csp.take(persist.findModelByQuery(events.Event, eventQuery));
+        return events;
+    })
+};
+
 var newAction = function(req, res) {
     var myEvent = new events.Event({name: '',
         location: '',
@@ -145,6 +183,16 @@ var deleteAction = function(req, res, next) {
     })
 };
 
+// middleware to find events not restricted for this user
+router.use(function(req, res, next) {
+    var allowedEvents = getAllowedEvents(req.user, req.params.id); // note req.params.id will be null if the request didn't have an :id segment
+    if(allowedEvents instanceof Error) {
+        next(403, allowedEvents);
+    } else {
+        req.allowedEvents = allowedEvents;
+        next();
+    }
+});
 // index
 router.get('/', indexAction);
 // create

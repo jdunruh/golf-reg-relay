@@ -15,7 +15,6 @@ var playerInFlight = (flight, player) => flight.get("players").some(el => el.get
 
 
 var findTimes = function(event, player) {
-    console.log(player);
     return event.get("flights").filter((el) => (!flightFull(el) && !playerInFlight(el, player)));
 };
 

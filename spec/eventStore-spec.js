@@ -2,8 +2,14 @@ im = require('immutable');
 store = require('../src/js/stores/eventStore.js');
 
 // global immutables used over many tests
-    var flight1 = store.newFlight(4, "10:20", im.Set(["Harry", "Sally", "Morrie"]));
-    var flight2 = store.newFlight(2, "1026", im.Set(["Tommy", "Annie"]));
+    var harry = im.Map({name: "Harry", _id: 1234});
+    var sally = im.Map({name: "Sally", _id: 2345});
+    var morrie = im.Map({name: "Morrie", _id: 3456});
+    var tommy = im.Map({name: "Tommy", _id: 4567});
+    var annie = im.Map({name: "Annie", _id: 5678});
+    var karen = im.Map({name: "Karen", _id:6789});
+    var flight1 = store.newFlight(4, "10:20", im.Set([harry, sally, morrie]));
+    var flight2 = store.newFlight(2, "1026", im.Set([tommy, annie]));
     var flight3 = store.newFlight(4, "10:32", im.Set([]));
 
 beforeEach(function() {
@@ -43,33 +49,33 @@ describe("A player", function() {
     store.addEventToStore("Tuesday", "Fossil Trace", im.List.of(flight1, flight2, flight3));
 
     it("can be added to a flight", function() {
-        store.addPlayerToFlight(0, 0, "Karen");
-        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
+        store.addPlayerToFlight(0, 0, karen);
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes(karen)).toBeTruthy();
     });
 
     it("cannot be added a second time", function() {
-        store.addPlayerToFlight(0, 0, "Karen");
-        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Karen")).toBeTruthy();
-        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).filter(x => x === "Karen").size).toEqual(1);
+        store.addPlayerToFlight(0, 0, karen);
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes(karen)).toBeTruthy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).filter(x => x === karen).size).toEqual(1);
     });
 
     it("cannot be added to a full flight", function() {
-        store.addPlayerToFlight(0, 1, "Karen");
-        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes("Karen")).toBeFalsy();
+        store.addPlayerToFlight(0, 1, karen);
+        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes(karen)).toBeFalsy();
     });
 
     it("can be removed from the event", function() {
-        store.removePlayerFromEvent(0, "Sally");
-        expect(utils.inTeeList(store.getEventsFromStore().get(0), "Sally")).toBeFalsy();
+        store.removePlayerFromEvent(0, sally);
+        expect(utils.inTeeList(store.getEventsFromStore().get(0), sally)).toBeFalsy();
     });
     it("can be moved to a different flight if it isn't full", function() {
-        store.movePlayerToFlight(0, "Harry", 2);
-        expect(store.getEventsFromStore().getIn([0, "flights", 2, "players"]).includes("Harry")).toBeTruthy();
+        store.movePlayerToFlight(0, harry, 2);
+        expect(store.getEventsFromStore().getIn([0, "flights", 2, "players"]).includes(harry)).toBeTruthy();
     });
     it("cannot be moved to a full flight", function() {
         store.movePlayerToFlight(0, "Harry", 1);
-        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes("Harry")).toBeFalsy();
-        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes("Harry")).toBeTruthy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 1, "players"]).includes(harry)).toBeFalsy();
+        expect(store.getEventsFromStore().getIn([0, "flights", 0, "players"]).includes(harry)).toBeTruthy();
     });
 });
 
@@ -82,9 +88,10 @@ describe("JSON Conversion - fromJSCustom", function() {
 
 describe("removePlayerFromFlight", function() {
     it("can remove a player", function() {
-        var fl1 = im.Map({maxPlayers: 4, players: im.Set([im.Map({name: 'abc', id:1234}), im.Map({name: 'def', id:2345})])});
-        var fl2 = im.Map({maxPlayers: 2, players: im.Set([im.Map({name: 'abc', id:1234})])});
-        var store = im.Map({events: im.List([im.Map({location: 'abc', flights: im.List([fl1, fl2])})])});
-        expect(store.removePlayerFromEvent(0, im.Map({name: 'abc', id: 1234}));
+        var fl1 = im.Map({maxPlayers: 4, players: im.Set([im.Map({name: 'abc', _id:1234}), im.Map({name: 'def', _id:2345})])});
+        var fl2 = im.Map({maxPlayers: 2, players: im.Set([im.Map({name: 'abc', _id:1234})])});
+        store.store = im.Map({events: im.List([im.Map({location: 'abc', flights: im.List([fl1, fl2])})])});
+        store.removePlayerFromEvent(0, im.Map({name: 'abc', _id: 1234}));
+        expect(store.store.getIn(['events', 0, 'flights', 0]).includes(im.Map({name: 'abc', _id: 1234}))).toBeFalsy();
     })
 });
