@@ -17,12 +17,12 @@ var findIndexOfEvent = function(events, id) {
 };
 
 var generateSelect = function (event, value, changeFn, player) {
-    if (utils.availableFlights(event.get("flights")).count() === 0) {
+    if (utils.availableFlights(event.get("flights")).count === 0) {
         return null;
     } else { // list of options containing only those flights with room for more players
         var selectList = utils.findTimes(event, player).map(el =>
             <option key={el.get("time")} value={el.get("index")}>{el.get("time")}</option>);
-        return <select className="time-select" name="time" value={ value }
+        return <select className="time-dropdown" name="time" value={ value }
                                 onChange={changeFn}> { selectList } </select>;
     }
 };
@@ -30,19 +30,19 @@ var generateSelect = function (event, value, changeFn, player) {
 function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initialSelectVal) {
     if(!utils.inTeeList(event, player)) {                       // not currently in event
        return <div>
+           <div className="time-select">
+               {generateSelect(event, initialSelectVal, changeFn, player)}
+           </div>
            <div className="left-buttons">
            </div>
            <div className="right-buttons">
                <span>
-                   <button className="btn" onClick={addFn}>Add Me At</button>
-                   <div>
-                       {generateSelect(event, initialSelectVal, changeFn, player)}
-                   </div>
+                   <button className="btn" onClick={addFn}>Add Me</button>
                </span>
            </div>
        </div>;
     } else {
-        if(utils.availableFlights(event.get("flights")).count() === 0) { // in event, but no place to move
+        if(utils.availableFlights(event.get("flights")).count === 0) { // in event, but no place to move
             return <div>
                 <div className="left-buttons">
                     <button className="btn" onClick={removeFn}>Cancel My Time</button>
@@ -54,23 +54,21 @@ function generateButtons(event, player, addFn, removeFn, moveFn, changeFn, initi
             </div>;
         } else {                                                        // in event, can move
             return <div>
+                <div className="time-select">
+                    {generateSelect(event, initialSelectVal, changeFn, player)}
+                </div>
                 <div className="left-buttons">
-                    <button className="btn" onClick={removeFn}>Cancel My Time</button>
+                    <button className="btn remove-btn" onClick={removeFn}>Remove Me</button>
                 </div>
                 <div className="right-buttons">
                     <span>
-                        <button className="btn" onClick={moveFn}>Move Me To</button>
-                        <div>
-                            {generateSelect(event, initialSelectVal, changeFn, player)}
-                        </div>
+                        <button className="btn" onClick={moveFn}>Move Me</button>
                     </span>
                 </div>
             </div>;
         }
     }
 }
-
-
 
 var OptionTemplate = React.createClass({
     displayName: 'OptionTemplate',
@@ -185,7 +183,7 @@ var TimeSelector = React.createClass({
         playerStore.removeNewPlayerListener(this.handleNewPlayer);
     },
     componentWillReceiveProps: function(nextProps) { // here timeSelect is the index of the first select value
-        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])}) // TODO - is this 0 correct?
+        this.setState({timeSelect: utils.findTimes(nextProps.event, nextProps.player).getIn([0, "index"])})
     },
     handleSelectChange: function (e) {
         this.setState({timeSelect: e.target.value})
@@ -216,18 +214,20 @@ var TimeSelector = React.createClass({
         eventActions.movePlayer({player: playerStore.getCurrentPlayer(), flight: this.state.timeSelect,
             event: findIndexOfEvent(events, this.props.params.id)})
     },
-    render: function () { // timeselect last param not used.
+    render: function () {
         return ( <form>
-            {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove, this.handleSelectChange, this.state.timeSelect)}
             <TypeAheadWidget player={ this.props.player }/>
+            {generateButtons(this.props.event, this.props.player, this.handleAdd, this.handleRemove, this.handleMove, this.handleSelectChange, this.state.timeSelect)}
+            <div className="clearfix"></div>
         </form>);
     }
 });
 
 var TeeTime = React.createClass({
     render: function () {
-        var players = this.props.timeData.get("players").map(function (el, index) {
-            return (<tr className="player" key={index}>
+        var playerList = this.props.timeData.get("players");
+        var players = playerList.map(function (el) {
+            return (<tr className="player" key={el.get('_id')}>
                 <td>{el.get('name')}</td>
             </tr>)
         });
@@ -235,9 +235,14 @@ var TeeTime = React.createClass({
             <table className="tee-time">
                 <tbody>
                 <tr>
-                    <td>{this.props.timeData.get("time") + " up to " + this.props.timeData.get("maxPlayers") + " players"}</td>
+                    <td>{this.props.timeData.get("time") }</td>
                 </tr>
                 { players }
+                <tr>
+                    <td className="remaining-slots">
+                    {this.props.timeData.get('maxPlayers') - playerList.size} slots available at this time
+                    </td>
+                </tr>
                 </tbody>
             </table>)
     }
@@ -245,8 +250,8 @@ var TeeTime = React.createClass({
 
 var TeeTimeList = React.createClass({
     render: function () {
-        var times = this.props.teeTimes.map(function (el, index) {
-            return <TeeTime key={index} timeData={ el }/>
+        var times = this.props.teeTimes.map(function (el) {
+            return <TeeTime key={el.get('time')} timeData={ el }/>
         });
 
         return ( <div className="tee-time-list">
@@ -275,11 +280,15 @@ var TeeTimeTable = React.createClass({
         playerStore.removeChangeListener(this._onChange);
     },
     render: function () {
+        var event = this.state.events.get(findIndexOfEvent(this.state.events, this.props.params.id));
         return ( <div id="tee-time-table" className="form-box">
-            <TimeSelector event={ this.state.events.get(findIndexOfEvent(this.state.events, this.props.params.id)) }
+            <h3>{event.get('name')}</h3>
+            <h3>{event.get('location')}</h3>
+            <h3>{event.get('date')}</h3>
+            <TeeTimeList teeTimes={ event.get("flights") }/>
+            <TimeSelector event={ event }
                           player={ playerStore.getCurrentPlayer() }
                           params= {this.props.params }/>
-            <TeeTimeList teeTimes={ this.state.events.get(findIndexOfEvent(this.state.events, this.props.params.id)).get("flights") }/>
         </div>)
     }
 });

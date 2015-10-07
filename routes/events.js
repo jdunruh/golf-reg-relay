@@ -75,7 +75,7 @@ var addScope = function(andOr, scope, query) {
 var getAllowedEvents= function(user, event_id) {
     csp.go(function*() {
         var eventQuery;
-        var orgs = csp.take(persist.findModelByQuery(organizations.Org, {organizers: {$in: [user._id]}}));
+        var orgs = yield csp.take(persist.findModelByQuery(organizations.Org, {organizers: {$in: [user._id]}}));
         if(orgs instanceof Error) {
             return orgs;
         }
@@ -86,7 +86,7 @@ var getAllowedEvents= function(user, event_id) {
             eventQuery = {};
         eventQuery['$or:'] = [{organizers: {$in: [user._id]}},
             {organizations: {$in: orgIds}}];
-        var events = csp.take(persist.findModelByQuery(events.Event, eventQuery));
+        var events = yield csp.take(persist.findModelByQuery(events.Event, eventQuery));
         return events;
     })
 };

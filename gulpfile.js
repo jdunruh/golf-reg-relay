@@ -33,7 +33,8 @@ var path = {
 
 gulp.task('copy', function(){
     gulp.src(path.HTML)
-        .pipe(gulp.dest(path.DEST));
+        .pipe(gulp.dest(path.DEST))
+        .on('error', function() {console.log('cannot copy index.html')});
 });
 
 gulp.task('watch', function() {
@@ -60,7 +61,7 @@ gulp.task('watch', function() {
     ]);
     // any errors in the above streams will get caught
     // by this listener, instead of being thrown:
-    combined.on('error', console.error.bind(console));
+    combined.on('error', function() {console.error.bind(console)});
 
     return combined;
 
@@ -107,11 +108,11 @@ gulp.task('replaceHTML', function(){
 });
 
 gulp.task('sass', function () {
-    gulp.src('path.CSS_ENTRY')
-        .pipe(sass().on('error', console.log('sass compilation error')))
+    gulp.src(path.CSS_ENTRY)
+        .pipe(sass().on('error', function() {console.log('sass compilation error')}))
         .pipe(gulp.dest(path.DEST_CSS));
-    gulp.src('path.UI_CSS_ENTRY')
-        .pipe(sass().on('error', sass.logError))
+    gulp.src(path.UI_CSS_ENTRY)
+        .pipe(sass().on('error', function() {sass.logError}))
         .pipe(gulp.dest(path.DEST_CSS));
 
 });
@@ -119,4 +120,4 @@ gulp.task('sass', function () {
 
 gulp.task('production', ['replaceHTML', 'build']);
 
-gulp.task('default', ['watch', 'sass:watch']);
+gulp.task('default', ['watch', 'sass']);

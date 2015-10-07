@@ -238,8 +238,7 @@ select {
  *    `input` and others.
  */
 button,
-html input[type="button"],
-input[type="reset"],
+html input[type="button"], input[type="reset"],
 input[type="submit"] {
   -webkit-appearance: button;
   /* 2 */
@@ -368,10 +367,6 @@ h3 h4 {
 html {
   background-color: #b7fdfe; }
 
-body {
-  padding-left: 20px;
-  padding-top: 20px; }
-
 td {
   padding-left: 5px;
   padding-right: 5px; }
@@ -431,5 +426,3 @@ select, option {
 
 h1 {
   text-align: center; }
-
-/*# sourceMappingURL=app.css.map */

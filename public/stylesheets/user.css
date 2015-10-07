@@ -1,13 +1,24 @@
 /* Coolors Exported Palette - coolors.co/a80874-b7fdfe-5ef38c-2b9720-343a1a */
 html {
-  background: url("/images/splash-large.jpg") no-repeat center center fixed;
-  background-size: cover; }
+  background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url("/images/splash-large.jpg") no-repeat center center fixed;
+  background-size: cover;
+  box-sizing: border-box; }
 
 .form-box {
   background-color: #b7fdfe;
   border-radius: 10px;
   padding: 20px;
   width: 320px; }
+
+@media (max-width: 600px) {
+  .form-box {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px; } }
+
+.remaining-slots {
+  font-weight: bold; }
 
 .text-box {
   background-color: #b7fdfe;
@@ -27,7 +38,18 @@ html {
 
 .time-select {
   margin-top: 10px;
-  margin-left: 2px; }
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 75%; }
+
+.time-dropdown {
+  width: 100%; }
+
+#tee-time-table h3 {
+  text-align: center;
+  margin-top: 3px;
+  margin-bottom: 3px; }
 
 .react-typeahead-container {
   clear: both;
@@ -75,4 +97,8 @@ html {
 .event-link {
   font-weight: bold; }
 
-/*# sourceMappingURL=user.css.map */
+.clearfix {
+  clear: both; }
+
+.remove-btn {
+  background-color: #a80874; }

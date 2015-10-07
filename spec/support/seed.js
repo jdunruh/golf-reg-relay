@@ -100,14 +100,19 @@ organizations.Org.remove({})
 }).then(function () {
     return org1.save();
 }).then(function () {
+    player.organizations = [org._id];
     return player.save();
 }).then(function () {
+    player1.organizations = [org._id, org1._id];
     return player1.save();
 }).then(function () {
+    player2.organizations = [org._id];
     return player2.save();
 }).then(function () {
+    player3.organizations = [org1._id];
     return player3.save();
 }).then(function () {
+    player4.organizations = [org1._id];
     return player4.save();
 }).then(function () {
     org.organizers = [player1._id, player2._id];
@@ -116,10 +121,16 @@ organizations.Org.remove({})
     org1.organizers = [player3._id];
     return org.save();
 }).then(function () {
+    event.organizers = [player1._id];
+    event.organizations = [org._id];
     return event.save();
 }).then(function () {
+    event1.organizers = [player1._id, player3._id];
+    event1.organizations = [org1._id];
     return event1.save();
 }).then(function () {
+        event2.organizers = [player._id];
+        event2.organizations = [org1._id];
     return event2.save();
 }).then(function() {
         process.exit();
