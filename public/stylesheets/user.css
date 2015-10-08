@@ -8,7 +8,8 @@ html {
   background-color: #b7fdfe;
   border-radius: 10px;
   padding: 20px;
-  width: 320px; }
+  width: 320px;
+  margin: 20px; }
 
 @media (max-width: 600px) {
   .form-box {
