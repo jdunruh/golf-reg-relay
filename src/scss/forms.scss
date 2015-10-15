@@ -1,3 +1,6 @@
+@import 'palette';
+@import 'fonts';
+
 a {
   color: $highlight;
 }
@@ -58,6 +61,11 @@ select, option {
   color: #ffffff;
   font-size: 16px;
   background-color: $highlight;
+}
+
+.show-form input[disabled] {
+  background-color: rgba(0,0,0,0);
+  border-style: none;
 }
 
 

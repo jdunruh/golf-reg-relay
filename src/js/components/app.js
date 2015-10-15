@@ -316,11 +316,15 @@ const SelectEvent = React.createClass({
     render:  function() {
         var eventList = eventStore.getEventsFromStore()
             .map(event => <EventListItem event={event} key={event.get('_id')}/>);
-        return (<div className="form-box"> <ul className="pick-list">
-                { eventList }
-            </ul>
-            </div>
-        )
+        if(eventList.count > 0) {
+            return (<div className="form-box">
+                    <ul className="pick-list">
+                        { eventList }
+                    </ul>
+                </div>
+            )
+        } else
+        return <h1>Sorry, you don't have any events</h1>
     }
 });
 

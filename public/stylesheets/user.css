@@ -103,3 +103,10 @@ html {
 
 .remove-btn {
   background-color: #a80874; }
+
+.icon-button {
+  background-color: transparent;
+  border: none; }
+
+.add-remove-button {
+  color: #a80874; }

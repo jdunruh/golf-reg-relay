@@ -93,6 +93,9 @@ app.use('/players', playersRoute);
 app.use('/events', events);
 app.use('/', login);
 app.use('/organizations', organizationsRoute);
+app.get('/organizers/*', function(req, res) {
+    res.sendFile(path.resolve(__dirname, 'public', 'organizers.html'))
+});
 app.get('*', function(request, response){
     response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 });

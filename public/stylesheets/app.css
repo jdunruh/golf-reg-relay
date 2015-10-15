@@ -5,6 +5,7 @@
  *    user zoom.
  */
 @import url(http://fonts.googleapis.com/css?family=Lora:400,700|Source+Sans+Pro:400,600);
+@import url(http://fonts.googleapis.com/css?family=Lora:400,700|Source+Sans+Pro:400,600);
 html {
   font-family: sans-serif;
   /* 1 */
@@ -371,6 +372,7 @@ td {
   padding-left: 5px;
   padding-right: 5px; }
 
+/* Coolors Exported Palette - coolors.co/a80874-b7fdfe-5ef38c-2b9720-343a1a */
 a {
   color: #2b9720; }
 
@@ -420,6 +422,10 @@ select, option {
   color: #ffffff;
   font-size: 16px;
   background-color: #2b9720; }
+
+.show-form input[disabled] {
+  background-color: transparent;
+  border-style: none; }
 
 #content table, #content form {
   margin: 0 auto; }
