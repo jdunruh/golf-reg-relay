@@ -134,9 +134,20 @@ html {
 .icon-button {
   background-color: transparent;
   border: none;
+  float: left;
+  margin-top: 33px;
+}
+
+.max-players {
+  float:left;
+  margin-top: 15px;
 }
 
 .add-remove-button {
   color: $danger;
+}
+
+.time-picker {
+  float: left;
 }
 

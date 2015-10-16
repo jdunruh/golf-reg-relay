@@ -106,7 +106,16 @@ html {
 
 .icon-button {
   background-color: transparent;
-  border: none; }
+  border: none;
+  float: left;
+  margin-top: 33px; }
+
+.max-players {
+  float: left;
+  margin-top: 15px; }
 
 .add-remove-button {
   color: #a80874; }
+
+.time-picker {
+  float: left; }

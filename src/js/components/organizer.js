@@ -13,6 +13,7 @@ import eventStore from '../stores/eventStore';
 import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import TimePicker from 'react-time-picker';
+import uuid from 'node-uuid';
 
 require('./base.css');
 require('./hackerone.css');
@@ -37,7 +38,7 @@ var validateField = function(validator, value, element) {
 // To allow a variable number of validations as arguments, the validatonArray is an ES2015 rest parameter
 function validationCombiner(...validationArray){
     return validationArray.reduce((acc, val) => { return [ val[0] === '' ? acc[0] : acc[0].concat(val[0]) , acc[1] && val[1] ]; }, [[], true])
-};
+}
 
 var nullValidator = function() {return ['', true];};
 
@@ -199,56 +200,46 @@ var FlightForm = React.createClass({
         return {maxPlayers: this.props.maxPlayers || 4,
                 time: this.props.time || "7:00 AM",
                 checkValidateMaxPlayers: false,
-                last: false
         };
     },
     getDefaultProps: function() {
         return {formClass: 'edit',
                 addFlight: function() {},
-                removeFlight: function() {}};
-    },
-    handleTimeChange: function(e) {
-        this.setState({time: e.tarrget.value});
+                removeFlight: function() {},
+                last: false,
+                maxPlayers: 4
+        };
     },
     onBlur: function(field) {
         var validatorFlag = {};
-        validatorFlag["checkValidate" + field] = true;
+        var validatorFlag["checkValidate" + field] = true;
         this.setState(validatorFlag);
     },
-    handleTextBoxChange(field, e) {
-        var tempState = {};
-        tempState[field] = validator.trim(e.target.value.trim);
-        this.setState(tempState);
-    },
-    validateNumberOfPlayers: function(val) {
-        if(validator.isInt(val, {min: 1, max: 6}))
-            return ['', true];
-        else
-            return ['Number of Players must be an integer between 1 and 6', false]
-    },
     render: function() {
-        return <tr>
-                <td>
-            <TimePicker
-                value ={this.state.time}
-                onChange ={ this.handleTimeChange } />
-                    </td>
-                <td>
-                        <ValidatedInput wrappedComponent={<input type="text" value={this.state.maxPlayers} name="maxPlayers"
-                        onChange={this.handleTextBoxChange.bind(this, "mapPlayers")}
-                        onBlur = {this.onBlur.bind(this, "MaxPlayers")}/>}
-                            validation={this.validateNumberOfPlayers(this.state.maxPlayers)}
-                            checkValidity={this.state.checkValidateMaxPlayers} />
-                    </td>
-            <td>{this.props.formClass === 'edit' ?
+        return  <div className="clearfix">
+            <TimePicker className="time-picker"
+                value ={this.props.time}
+                onChange ={ this.props.handleTimeChange } />
+            <label className="max-players">Number of Players
+                <ValidatedInput wrappedComponent={<input type="text" value={this.props.maxPlayers} name="maxPlayers"
+                onChange={this.props.handleMaxPlayersChange}
+                onBlur = {this.onBlur.bind(this, "MaxPlayers")}/>}
+                    validation={this.props.validateNumberOfPlayers}
+                    checkValidity={this.state.checkValidateMaxPlayers} />
+            </label>
+            {this.props.formClass === 'edit' ?
                 <button className="icon-button" onClick={this.props.removeFlight}>
-                    <i className="fa fa-minus-circle fa-2x add-remove-button"></i></button> : ''} </td>
-            <td>{(this.props.formClass === 'edit' && this.props.last) ?
+                    <i className="fa fa-minus-circle fa-2x add-remove-button"></i></button> : ''}
+            {(this.props.formClass === 'edit' && this.props.last) ?
                 <button className="icon-button" onClick={this.props.addFlight}>
-                    <i className="fa fa-plus-circle fa-2x add-remove-button"></i></button> : ''}</td>
-                </tr>
+                    <i className="fa fa-plus-circle fa-2x add-remove-button"></i></button> : ''}
+                </div>
                         }
 });
+
+var addUuid = function(flight) {
+    return flight.set('key', uuid.v4());
+};
 
 var EventForm = React.createClass({
     getInitialState: function() {
@@ -259,12 +250,15 @@ var EventForm = React.createClass({
                 address: this.props.address || '',
                 city: this.props.city || '',
                 state: this.props.state || '',
-                zip: this.props.zip || ''
-        }
+                zip: this.props.zip || '',
+                flights: this.props.flights.map(function(el) {
+                        return addUuid(el);
+                    })
+                }
     },
     getDefaultProps: function() {
         return {formClass: "edit",
-            flights: im.List([im.Map({maxPlayers: '', time: '7:00 AM', _id: 0})])}
+            flights: im.List([im.Map({maxPlayers: '4', time: '7:00 AM', key: uuid.v4()})])}
     },
     onDateChange: function(dateString, moment){
         this.setState({date: dateString});
@@ -299,10 +293,10 @@ var EventForm = React.createClass({
             return ['State must be 2 characters', false];
     },
     validateZip: function(val) {
-        if(validator.isLength(val, 5, 10))
+        if (validator.isNumeric(val) && validator.isLength(val, 5, 5))
             return ['', true];
         else
-            return ['Zip must be 5 to 10 characters', false];
+            return ['Zip must be 5 digits', false];
     },
     validateCity: function(val) {
         if(validator.isLength(val, 5, 25))
@@ -310,20 +304,57 @@ var EventForm = React.createClass({
         else
             return ['Name must be 5 to 25 characters', false];
     },
-    handleTextBoxChange(field, e) {
+    validateNumberOfPlayers: function(val) {
+        if(validator.isInt(val, {min: 1, max: 6}))
+            return ['', true];
+        else
+            return ['Number of Players must be an integer between 1 and 6', false]
+    },
+    isFlightValid: function(flight) {
+        return this.validateNumberOfPlayers(flight.get('maxPlayers'));
+    },
+    isDisabled: function() {
+        var fieldValidatons = [this.validateName(this.state.name), this.validateCourse(this.state.course), this.validateAddress(this.state.address),
+            this.validateCity(this.state.city), this.validateState(this.state.state), this.validateZip(this.state.zip)];
+        var flightValidations = this.state.flights.map(flight => this.isFlightValid(flight)).toJS();
+        return validationCombiner.apply(this, flightValidations.concat(fieldValidatons))[1];
+    },
+    handleTextBoxChange: function(field, e) {
+        e.preventDefault();
         var tempState = {};
         tempState[field] = e.target.value.trim();
         this.setState(tempState);
     },
+    handleTimeChange: function(flightIndex, newValue) {
+        this.setState({flights: this.state.flights.setIn([flightIndex, 'time'], newValue)});
+    },
+    handleMaxPlayersChange: function(flightIndex, e) {
+        e.preventDefault();
+        this.setState({flights: this.state.flights.setIn([flightIndex, 'maxPlayers'], validator.trim(e.target.value))});
+    },
+    removeFlight: function(flightIndex, e) {
+        e.preventDefault();
+        this.setState({flights: this.state.flights.delete(flightIndex)});
+    },
+    addFlight: function(e) {
+        e.preventDefault();
+        this.setState({flights: this.state.flights.push(im.Map({maxPlayers: '4', time: '7:00 AM', key: uuid.v4()}))});
+    },
     render: function() {
-        var length = this.props.flights.size;
+        var _this = this;
+        var length = this.state.flights.size;
         var formClass = this.props.formClass;
-        var flights = this.props.flights.map(function(el, index) {
-            return <FlightForm key={el._id}
-                time = {el.time}
-                maxPlayers = {el.maxPlayers}
+        var flights = this.state.flights.map(function(el, index) {
+            return <FlightForm key={el.get('key')}
+                time = {el.get('time')}
+                maxPlayers = {el.get('maxPlayers')}
                 last = { index === (length - 1)}
-                formClass = {formClass}/>
+                formClass = {formClass}
+                addFlight = {_this.addFlight}
+                removeFlight = {_this.removeFlight.bind(_this, index)}
+                handleTimeChange = {_this.handleTimeChange.bind(_this, index)}
+                handleMaxPlayersChange = {_this.handleMaxPlayersChange.bind(_this, index)}
+                maxPlayerValidator = {_this.validateNumberOfPlayers.bind(_this, _this.state.flights.getIn([index, 'maxPlayers']))}/>
         });
             return <form className = {this.props.formCLass}>
                 <label>Event Name
@@ -377,15 +408,11 @@ var EventForm = React.createClass({
                                     checkValidity={this.state.checkValidateZip} />
                 </label>
                 <h3>Tee Times for This Event</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Time</td>
-                            <td>Max Players</td>
-                            <td></td><td></td>
-                        </tr>
-                    </thead>
-                    <tbody> {flights} </tbody></table>
+                    {flights}
+                <div className="clearfix">
+                    <button className="btn cancel">Cancel</button>
+                    <button className="btn accept" disabled={!this.isDisabled()}>Save</button>
+                </div>
             </form>
         }
 });

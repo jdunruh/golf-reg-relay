@@ -208,6 +208,12 @@ AppDispatcher.register(function(payload){
         case appConstants.MOVE_PLAYER:
             movePlayer(action.data.event, action.data.player, action.data.flight);
             break;
+        case appConstants.ADD_EVENT:
+            addEventToStore(action.data.event.date, action.data.event.location, action.data.event.flights);
+            break;
+        case appConstants.REMOVE_EVENT:
+            removeEventFromStore(event);
+            break;
         default:
             return true;
     }
