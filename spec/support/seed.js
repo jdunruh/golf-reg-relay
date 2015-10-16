@@ -46,7 +46,7 @@ player4.registered = true;
 var event = new events.Event;
 event.name = "Monday Night Golf";
 event.location = "Willis Case";
-event.date = moment().add(1, 'days');
+event.date = moment().add(1, 'weeks');
 event.organizations = [org];
 event.flights = [
     {
@@ -63,7 +63,7 @@ event.flights = [
 var event1 = new events.Event;
 event1.name = "Striker Monday League";
 event1.location = "Striker Golf, Wheat Ridge";
-event1.date = moment().add(2, 'days');
+event1.date = moment().add(2, 'weeks');
 event1.organizations = [org];
 event1.flights = [
     {
@@ -80,7 +80,7 @@ event1.flights = [
 var event2 = new events.Event;
 event2.name = "Indian Hill Golf League";
 event2.location = "Country Lakes";
-event2.date = moment().add(3, 'days');
+event2.date = moment().add(3, 'weeks');
 event2.organizations = [org1];
 event2.flights = [
     {
