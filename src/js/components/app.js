@@ -112,7 +112,8 @@ var TypeAheadWidget = React.createClass({
     getInitialState: function() {return {options: [], inputValue: this.props.player.get('name')}},
 
     _onChange: function() {
-        this.setState({options: this.getOptions(this.state.inputValue)});
+        if(this.state.inputValue.length > 2)
+            this.setState({options: this.getOptions(this.state.inputValue)});
     },
 
     componentDidMount: function() { playerStore.addChangeListener(this._onChange)},
@@ -122,7 +123,8 @@ var TypeAheadWidget = React.createClass({
     handleChange: function(event) {
         var value = event.target.value;
         this.setInputValue(value);
-        this.setState({options: this.getOptions(value)});
+        if(value.length > 2)
+            this.setState({options: this.getOptions(value)});
     },
 
     onComplete(event, completedInputValue) {

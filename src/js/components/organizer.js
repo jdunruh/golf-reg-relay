@@ -212,7 +212,7 @@ var FlightForm = React.createClass({
     },
     onBlur: function(field) {
         var validatorFlag = {};
-        var validatorFlag["checkValidate" + field] = true;
+        validatorFlag["checkValidate" + field] = true;
         this.setState(validatorFlag);
     },
     render: function() {
