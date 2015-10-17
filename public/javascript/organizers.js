@@ -51232,7 +51232,7 @@ var OrgForm = React.createClass({
         return { formClass: 'edit-form' }; // edit-form for update (with save button and delete button), show-form for show (read only with edit button)
     },
     handleSubmit: function handleSubmit() {
-        validator.trim(this.state.orgName);;
+        validator.trim(this.state.orgName);
     },
     orgValidator: function orgValidator(content) {
         if (validator.isNull(validator.trim(content))) return ['Organization name cannot be blank', false];else return ['', true];
@@ -51482,7 +51482,7 @@ var EventForm = React.createClass({
         if (validator.isLength(val, 5, 25)) return ['', true];else return ['Name must be 5 to 25 characters', false];
     },
     validateNumberOfPlayers: function validateNumberOfPlayers(val) {
-        if (validator.isInt(val, { min: 1, max: 6 })) return ['', true];else return ['Number of Players must be an integer between 1 and 6', false];
+        if (validator.isInt(val, { min: 1, max: 6 })) return ['', true];else return ['Number of Players must be between 1 and 6', false];
     },
     isFlightValid: function isFlightValid(flight) {
         return this.validateNumberOfPlayers(flight.get('maxPlayers'));
@@ -51490,16 +51490,16 @@ var EventForm = React.createClass({
     isDisabled: function isDisabled() {
         var _this2 = this;
 
-        var fieldValidatons = [this.validateName(this.state.name), this.validateCourse(this.state.course), this.validateAddress(this.state.address), this.validateCity(this.state.city), this.validateState(this.state.state), this.validateZip(this.state.zip)];
+        var fieldValidations = [this.validateName(this.state.name), this.validateCourse(this.state.course), this.validateAddress(this.state.address), this.validateCity(this.state.city), this.validateState(this.state.state), this.validateZip(this.state.zip)];
         var flightValidations = this.state.flights.map(function (flight) {
             return _this2.isFlightValid(flight);
         }).toJS();
-        return validationCombiner.apply(this, flightValidations.concat(fieldValidatons))[1];
+        return validationCombiner.apply(this, flightValidations.concat(fieldValidations))[1];
     },
     handleTextBoxChange: function handleTextBoxChange(field, e) {
         e.preventDefault();
         var tempState = {};
-        tempState[field] = e.target.value.trim();
+        tempState[field] = validator.trim(e.target.value);
         this.setState(tempState);
     },
     handleTimeChange: function handleTimeChange(flightIndex, newValue) {
@@ -51517,6 +51517,17 @@ var EventForm = React.createClass({
         e.preventDefault();
         this.setState({ flights: this.state.flights.push(im.Map({ maxPlayers: '4', time: '7:00 AM', key: _nodeUuid2['default'].v4() })) });
     },
+    handleSubmit: function handleSubmit(e) {
+        e.preventDefault();
+        event.name = this.state.name;
+        event.location = this.state.course;
+        event.city = this.state.city;
+        event.state = this.state.state;
+        event.zip = this.state.zip;
+        event.date = this.state.date;
+        event.flights = this.state;
+        eventActions.addEvent(im.Map(event));
+    },
     render: function render() {
         var _this = this;
         var length = this.state.flights.size;
@@ -51531,7 +51542,7 @@ var EventForm = React.createClass({
                 removeFlight: _this.removeFlight.bind(_this, index),
                 handleTimeChange: _this.handleTimeChange.bind(_this, index),
                 handleMaxPlayersChange: _this.handleMaxPlayersChange.bind(_this, index),
-                maxPlayerValidator: _this.validateNumberOfPlayers.bind(_this, _this.state.flights.getIn([index, 'maxPlayers'])) });
+                validateNumberOfPlayers: _this.validateNumberOfPlayers(_this.state.flights.getIn([index, 'maxPlayers'])) });
         });
         return React.createElement(
             'form',
@@ -51623,7 +51634,7 @@ var EventForm = React.createClass({
                 ),
                 React.createElement(
                     'button',
-                    { className: 'btn accept', disabled: !this.isDisabled() },
+                    { className: 'btn accept', disabled: !this.isDisabled(), onClick: this.handleSubmit },
                     'Save'
                 )
             )
@@ -51751,9 +51762,9 @@ var newEvent = function newEvent(date, location, flights) {
     });
 };
 
-var addEventToStore = function addEventToStore(date, location, flights) {
+var addEventToStore = function addEventToStore(event) {
     store = store.updateIn(['events'], function (val) {
-        return val.push(newEvent(date, location, flights));
+        return val.push(event);
     });
 };
 
@@ -51896,13 +51907,13 @@ AppDispatcher.register(function (payload) {
             removePlayer(action.data.event, action.data.player);
             break;
         case appConstants.MOVE_PLAYER:
-            movePlayer(action.data.event, action.data.player, action.data.flight);
+            movePlayer(action.data.event);
             break;
         case appConstants.ADD_EVENT:
-            addEventToStore(action.data.event.date, action.data.event.location, action.data.event.flights);
+            addEventToStore(action.data.event);
             break;
         case appConstants.REMOVE_EVENT:
-            removeEventFromStore(event);
+            removeEventFromStore(action.data.event);
             break;
         default:
             return true;

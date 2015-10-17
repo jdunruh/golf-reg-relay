@@ -149,7 +149,6 @@ var editAction = function(req, res, next) {
         if(myEvent instanceof Error)
             next(404, myEvent);
         else {
-            console.log(common.convertEventDocumentsToHTMLValues([myEvent])[0]);
             res.render('events/edit.jade', {event: common.convertEventDocumentsToHTMLValues([myEvent])[0], errors: {}});
         }
     })

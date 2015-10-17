@@ -75,8 +75,8 @@ var newEvent = function(date, location, flights) {
     }))
 };
 
-var addEventToStore = function(date, location, flights) {
-    store = store.updateIn(["events"], val => val.push(newEvent(date, location, flights)))
+var addEventToStore = function(event) {
+    store = store.updateIn(["events"], val => val.push(event));
 };
 
 var addFlightToEvent = function(event, maxPlayers, time, players) {
@@ -206,13 +206,13 @@ AppDispatcher.register(function(payload){
             removePlayer(action.data.event, action.data.player);
             break;
         case appConstants.MOVE_PLAYER:
-            movePlayer(action.data.event, action.data.player, action.data.flight);
+            movePlayer(action.data.event);
             break;
         case appConstants.ADD_EVENT:
-            addEventToStore(action.data.event.date, action.data.event.location, action.data.event.flights);
+            addEventToStore(action.data.event);
             break;
         case appConstants.REMOVE_EVENT:
-            removeEventFromStore(event);
+            removeEventFromStore(action.data.event);
             break;
         default:
             return true;

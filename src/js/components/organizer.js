@@ -65,7 +65,7 @@ var OrgForm = React.createClass({
         return {formClass: "edit-form"}; // edit-form for update (with save button and delete button), show-form for show (read only with edit button)
     },
     handleSubmit: function() {
-        validator.trim(this.state.orgName);;
+        validator.trim(this.state.orgName);
     },
     orgValidator:  function(content) {
         if(validator.isNull(validator.trim(content)))
@@ -308,21 +308,21 @@ var EventForm = React.createClass({
         if(validator.isInt(val, {min: 1, max: 6}))
             return ['', true];
         else
-            return ['Number of Players must be an integer between 1 and 6', false]
+            return ['Number of Players must be between 1 and 6', false]
     },
     isFlightValid: function(flight) {
         return this.validateNumberOfPlayers(flight.get('maxPlayers'));
     },
     isDisabled: function() {
-        var fieldValidatons = [this.validateName(this.state.name), this.validateCourse(this.state.course), this.validateAddress(this.state.address),
+        var fieldValidations = [this.validateName(this.state.name), this.validateCourse(this.state.course), this.validateAddress(this.state.address),
             this.validateCity(this.state.city), this.validateState(this.state.state), this.validateZip(this.state.zip)];
         var flightValidations = this.state.flights.map(flight => this.isFlightValid(flight)).toJS();
-        return validationCombiner.apply(this, flightValidations.concat(fieldValidatons))[1];
+        return validationCombiner.apply(this, flightValidations.concat(fieldValidations))[1];
     },
     handleTextBoxChange: function(field, e) {
         e.preventDefault();
         var tempState = {};
-        tempState[field] = e.target.value.trim();
+        tempState[field] = validator.trim(e.target.value);
         this.setState(tempState);
     },
     handleTimeChange: function(flightIndex, newValue) {
@@ -340,6 +340,17 @@ var EventForm = React.createClass({
         e.preventDefault();
         this.setState({flights: this.state.flights.push(im.Map({maxPlayers: '4', time: '7:00 AM', key: uuid.v4()}))});
     },
+    handleSubmit: function(e) {
+        e.preventDefault();
+        event.name = this.state.name;
+        event.location = this.state.course;
+        event.city = this.state.city;
+        event.state = this.state.state;
+        event.zip = this.state.zip;
+        event.date = this.state.date;
+        event.flights = this.state;
+        eventActions.addEvent(im.Map(event));
+    },
     render: function() {
         var _this = this;
         var length = this.state.flights.size;
@@ -354,7 +365,7 @@ var EventForm = React.createClass({
                 removeFlight = {_this.removeFlight.bind(_this, index)}
                 handleTimeChange = {_this.handleTimeChange.bind(_this, index)}
                 handleMaxPlayersChange = {_this.handleMaxPlayersChange.bind(_this, index)}
-                maxPlayerValidator = {_this.validateNumberOfPlayers.bind(_this, _this.state.flights.getIn([index, 'maxPlayers']))}/>
+                validateNumberOfPlayers = {_this.validateNumberOfPlayers(_this.state.flights.getIn([index, 'maxPlayers']))}/>
         });
             return <form className = {this.props.formCLass}>
                 <label>Event Name
@@ -411,7 +422,7 @@ var EventForm = React.createClass({
                     {flights}
                 <div className="clearfix">
                     <button className="btn cancel">Cancel</button>
-                    <button className="btn accept" disabled={!this.isDisabled()}>Save</button>
+                    <button className="btn accept" disabled={!this.isDisabled()} onClick={this.handleSubmit}>Save</button>
                 </div>
             </form>
         }
