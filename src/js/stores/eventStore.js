@@ -85,7 +85,7 @@ var addEventToStore = function(event) {
         timeout: 3000
     }).done(function (data) {
         store = store.updateIn(["events"], val => val.push(event));
-    }).fail(function () {
+    }).fail(function (err) {
         alert("Unable to update server. Try again later.")
     });
 };
@@ -108,7 +108,7 @@ var addPlayer = function(event, flight, player) {
             addPlayerToFlight(event, flight, player);
             eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
         }
-    }).fail(function () {
+    }).fail(function (err) {
         alert("Unable to update server. Try again later.")
     });
 };
@@ -128,7 +128,7 @@ var updateEvent = function(event) {
     }).done(function (data) {
             updateEventInStore(event);
             eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
-    }).fail(function () {
+    }).fail(function (err) {
         alert("Unable to update server. Try again later.")
     });
 };
@@ -251,7 +251,7 @@ AppDispatcher.register(function(payload){
             movePlayer(action.data.event, action.data.player, action.data.flight);
             break;
         case appConstants.ADD_EVENT:
-            addEventToStore(action.data.event);
+            addEventToStore(action.data);
             break;
         case appConstants.REMOVE_EVENT:
             removeEventFromStore(action.data.event);

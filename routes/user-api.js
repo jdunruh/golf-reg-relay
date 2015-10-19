@@ -200,7 +200,7 @@ router.post('/newPlayer', function (req, res) {
 
 
 router.get('/getCurrentUser', function(req, res, next) {
-    res.status(200).json({name: req.user.name, _id: req.user._id})
+    res.status(200).json({name: req.user.name, _id: req.user._id, organizations: user.organizations})
 });
 
 router.get('/getAllPlayers', function (req, res, next) {

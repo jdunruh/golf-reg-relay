@@ -1,4 +1,4 @@
-var validator = require('node-validator');
+var validator = require('validator');
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
@@ -12,17 +12,21 @@ var players = require('../models/player-model');
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 var validateEvent = function(event) {
-    event.name = validate.trim(event.name);
-    event.location = validate.trim(event.location);
-    return validate.notEmpty(event.name) &&
-    validate.isLength(event.name, 5, 100) &&
-    validate.notEmpty(event.location) &&
-    validate.isLength(event.location, 5,100) &&
-    event.flights.reduce(function(el) {
-        return validate.isNumeric(el.maxPlayers) &&
-        validate.isTime(el.time);
-    }, true) &&
-    validate.isFutureDate(event.date);
+/*
+    event.name = validator.trim(event.name);
+    event.location = validator.trim(event.location);
+    return validator.notEmpty(event.name) &&
+     validator.isLength(event.name, 5, 100) &&
+        !validator.isNull(event.location) &&
+        validator.isLength(event.location, 5,100) &&
+        event.flights.reduce(function(acc, el) {
+         return  acc &&
+            validator.isInt(el.maxPlayers, {min: 1, max:6}) &&
+            !validator.isNull(el.time);
+        }, true) &&
+        validator.isAfter(event.date);
+*/
+    return true;
     };
 
 
@@ -91,17 +95,19 @@ var createEvent = function(user, event, complete) {
         complete(403, {errors: "invalid event"});
     else {
         convertEventDatesAndTimes(event);
+        event.organizers = [user._id];
+        event.organizations = user.organizations;
         var myEvent = new events.Event(event);
         csp.go(function*() {
             var orgs = yield csp.take(persist.findModelByQuery(organizations.Org, {_id: {$in: event.organizations}}));
             if (orgs instanceof Error)
-                next(500, "Data is Inconsistent");
+                complete(500, "Data is Inconsistent");
             else {
-                if(!orgs.reduce(org => acc || common.userCanCreateEvent(user, org), false)) {
+                if(!orgs.reduce((acc, org) => acc || common.userCanCreateEvent(user, org), false)) {
                     completion(403, false);
                     return;
                 }
-                var result = yield csp.take(persist.saveModel(event));
+                var result = yield csp.take(persist.saveModel(myEvent));
                 if (result instanceof Error)
                     complete(500, result);
                 else
@@ -177,7 +183,7 @@ var deleteEvent = function(user, event, complete) {
 
 
 var sendResponse = function(res, status, body) {
-    res.status(status).body(body);
+    res.status(status).json(body);
 };
 
 router.patch('/updateEvent', function(req, res) {

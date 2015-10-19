@@ -11,6 +11,7 @@ var golferSchema = new mongoose.Schema({
 var flightSchema = new mongoose.Schema({
     time: {type: Date, required: true},
     maxPlayers: {type: Number, required: true},
+    note: {type: String},
     players:[ golferSchema ]
 });
 

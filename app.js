@@ -21,6 +21,7 @@ var organizationsRoute = require('./routes/organizations');
 var expressValidator = require('express-validator');
 var session = require('express-session');
 var users = require('./routes/users');
+var eventAPI = require('./routes/event-api');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
 
@@ -88,6 +89,7 @@ passport.deserializeUser(function(id, done) {
 
 
 app.use('/api', appAPI);
+app.use('/event-api', eventAPI);
 app.use('/users', users);
 app.use('/players', playersRoute);
 app.use('/events', events);
@@ -116,6 +118,7 @@ app.use(function (req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
+        console.log(error);
         res.render('error', {
             message: err.message,
             error: err

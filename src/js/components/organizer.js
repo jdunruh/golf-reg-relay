@@ -368,7 +368,7 @@ var EventForm = React.createClass({
         event.state = this.state.state;
         event.zip = this.state.zip;
         event.date = this.state.date;
-        event.flights = this.state;
+        event.flights = this.state.flights;
         eventActions.addEvent(im.Map(event));
     },
     render: function() {

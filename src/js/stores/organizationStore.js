@@ -51,7 +51,7 @@ var addOrganizationToStore = function(org) {
     store = store.set(org.get('id'), org);
 };
 
-var removePlayer = function(orgId) {
+var removeOrg = function(orgId) {
     var org = store.find(x => x.get("_id") === orgId);
     if(!org) {
         $.ajax({
@@ -124,7 +124,7 @@ AppDispatcher.register(function(payload){
             removeOrg(action.data.org);
             break;
         case appConstants.UPDATE_ORG:
-            moveOrg(action.data.org);
+            updateOrg(action.data.org);
             break;
         default:
             return true;
