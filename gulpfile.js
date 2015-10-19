@@ -28,7 +28,7 @@ var path = {
     SERVER_OUT: 'server.js',
     CSS_SRC: './src/scss/*.scss',
     CSS_ENTRY: './src/scss/app.scss',
-    UI_CSS_ENTRY: './src/scss/user.scss'
+    UI_CSS_ENTRY: './src/scss/user.scss',
 };
 
 gulp.task('copy', function(){

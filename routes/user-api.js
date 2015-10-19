@@ -16,9 +16,7 @@ var players = require('../models/player-model');
 
 // event - event object, flight - flight index into event.flights array, player - player being changed
 var authorizedEventUpdate = function(user, player) {
-    console.log(user);
-    console.log(player);
-        return player._id.equals(user._id) || player.addedBy.equals(user._id);
+    return player._id.equals(user._id) || player.addedBy.equals(user._id);
 };
 
 // see if arr1 and arr2 have an element in common
@@ -53,7 +51,6 @@ var getAllPlayers = function(res) {
         if(result instanceof Error)
             res.status(404);
         else {
-            console.log(result);
             res.status(200).json(result);
         }
     })
@@ -61,16 +58,7 @@ var getAllPlayers = function(res) {
 
 
 router.get('/getAllEVents', function(req, res, next) {
-    /*   events.Event.find({}, null, { sort: { _id: 1 } }, function(err, docs) { // get events sorted by date
-     if(err) {
-     res.status(404).json(err);
-     } else { // have good data. Sort events by date then flights by time and then convert date and time values for display
-     var events = common.convertEventDocumentsToDisplay(docs);
-     res.status(200).json(events);
-     }
-     })
-     */
-    csp.go(function* () {
+     csp.go(function* () {
         var userEvents = yield csp.take(persist.findModelByQuery(events.Event, {organizations: {$in: req.user.organizations},
             date: {$gt: new Date()}}));
         if (userEvents instanceof Error) {
@@ -124,7 +112,7 @@ router.put('/addPlayer/', function(req, res, next) {
                 res.status(200).json({status: "already in flight"});
                 return;
             }
-            if (objectIdArrayMatch(event.organizations, req.user.organizations)) { // if player is in an org owning event
+            if (common.objectIdArrayMatch(event.organizations, req.user.organizations)) { // if player is in an org owning event
                 req.body.player.addedBy = req.user._id;
                 req.body.player.player_id = req.body.id;
                 event.flights[req.body.flight].players.push(req.body.player);
@@ -221,7 +209,6 @@ router.get('/getAllPlayers', function (req, res, next) {
         if (result instanceof Error)
             res.status(500).json(result);
         else {
-            console.log(result);
             res.status(200).json(result);
         }
     });

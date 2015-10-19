@@ -27,7 +27,7 @@ playersSchema = new mongoose.Schema({
     registered: Boolean,
     resetToken: String,
     resetExpires: Date,
-    organizations: [ObjectId]
+    organizations: [{type: ObjectId, ref: 'Org'}]
 });
 
 

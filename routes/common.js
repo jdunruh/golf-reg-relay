@@ -1,3 +1,5 @@
+require('babel/polyfill');
+
 var todayAsDate = function () {
     var today = new Date();
     return new Date((today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + " UTC");
@@ -103,7 +105,33 @@ var addErrorMessage = function (param, el, obj) {
         this.addErrorMessage(param, el, obj[key])
     }
     return obj;
-}
+};
+
+// see if arr1 and arr2 have an element in common
+var objectIdArrayMatch = function(arr1, arr2) {
+    var combined = arr1.concat(arr2);
+    combined.sort(); // sorts array in place
+    var previousElement = combined[0];
+    for(var i = 1; i < combined.length; i++) {
+        if(previousElement.equals(combined[i]))
+            return true;
+        previousElement = combined[i];
+    }
+    return false;
+};
+
+userOrganizesEvent = function(user, event, organization) {
+    return event.organizers.find(el => el === user._id) ||
+        organization.organizers.find(el => el === user._id);
+};
+
+eventBelongsToOrganization = function(event, organization) {
+    return objectIdArrayMatch(event.organizations.find(el => el === organization._id))
+};
+
+userCanCreateEvent = function(user, organization) {
+    return organization.organizers.find(el => user._id);
+};
 
 
 module.exports = {
@@ -111,7 +139,11 @@ module.exports = {
     dateToTimeString: dateToTimeString,
     convertEventDocumentsToDisplay: convertEventDocumentsToDisplay,
     convertEventDocumentsToHTMLValues: convertEventDocumentsToHTMLValues,
-    addErrorMessage: addErrorMessage
+    addErrorMessage: addErrorMessage,
+    objectIdArrayMatch: objectIdArrayMatch,
+    userOrganizesEvent: userOrganizesEvent,
+    eventBelongsToOrganization: eventBelongsToOrganization,
+    userCanCreateEvent: userCanCreateEvent
 };
 
 

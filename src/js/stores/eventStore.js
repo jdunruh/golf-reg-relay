@@ -76,7 +76,18 @@ var newEvent = function(date, location, flights) {
 };
 
 var addEventToStore = function(event) {
-    store = store.updateIn(["events"], val => val.push(event));
+    $.ajax({
+        dataType: "json",
+        method: "put",
+        contentType: "application/json",
+        url: window.location.origin + "/event-api/addEvent",
+        data: JSON.stringify({event: event}),
+        timeout: 3000
+    }).done(function (data) {
+        store = store.updateIn(["events"], val => val.push(event));
+    }).fail(function () {
+        alert("Unable to update server. Try again later.")
+    });
 };
 
 var addFlightToEvent = function(event, maxPlayers, time, players) {
@@ -97,6 +108,26 @@ var addPlayer = function(event, flight, player) {
             addPlayerToFlight(event, flight, player);
             eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
         }
+    }).fail(function () {
+        alert("Unable to update server. Try again later.")
+    });
+};
+
+var updateEventInStore = function(event) {
+    store = store.update('events', push(event));
+};
+
+var updateEvent = function(event) {
+    $.ajax({
+        dataType: "json",
+        method: "patch",
+        contentType: "application/json",
+        url: window.location.origin + "/event-api/updateEvent",
+        data: JSON.stringify({event: event}),
+        timeout: 3000
+    }).done(function (data) {
+            updateEventInStore(event);
+            eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
     }).fail(function () {
         alert("Unable to update server. Try again later.")
     });
@@ -132,7 +163,7 @@ var removePlayer = function(event, player) {
         method: "delete",
         url: window.location.origin + "/api/removeModel",
         timeout: 3000,
-        data: JSON.stringify({event: store.getIn(["events", event, "_id"]), player: player, flight: flight[0]}),
+        data: JSON.stringify({event: store.getIn(["events", event, "_id"]), player: player, flight: flight[0]})
     }).done(function (data) {
         removePlayerFromEvent(event, player);
         eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here to ensure that the emit is after the server update
@@ -143,8 +174,19 @@ var removePlayer = function(event, player) {
 
 // event is the index in the events list (array) of the event to remove
 var removeEventFromStore = function(event) {
-    store = store.update("events",
+    $.ajax({
+        dataType: "json",
+        contentType: "application/json",
+        method: "delete",
+        url: window.location.origin + "/api/removeEvent",
+        timeout: 3000,
+        data: JSON.stringify({event: event})
+    }).done(function (data) {
+        store = store.update("events",
         (coll) => coll.take(event).concat(coll.takeLast(coll.size - event - 1)));
+    }).fail(function (err) {
+        alert("Unable to update server. Try again later.")
+    });
 };
 
 var movePlayer = function(event, player, toFlight) {
@@ -200,13 +242,13 @@ AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
         case appConstants.ADD_PLAYER:
-            addPlayer(action.data.event, action.data.flight, action.data.player)
+            addPlayer(action.data.event, action.data.flight, action.data.player);
             break;
         case appConstants.REMOVE_PLAYER:
             removePlayer(action.data.event, action.data.player);
             break;
         case appConstants.MOVE_PLAYER:
-            movePlayer(action.data.event);
+            movePlayer(action.data.event, action.data.player, action.data.flight);
             break;
         case appConstants.ADD_EVENT:
             addEventToStore(action.data.event);

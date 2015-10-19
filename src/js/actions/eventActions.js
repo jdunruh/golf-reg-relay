@@ -27,8 +27,14 @@ var eventActions = {
         })
     },
     removeEvent: function(event) {
-        AppDispatcher.handleACtion({
+        AppDispatcher.handleAction({
             actionType: appConstants.REMOVE_EVENT,
+            data: event
+        })
+    },
+    updateEvent: function(event) {
+        AppDispatcher.handelAction({
+            actionType: appConstants.UPDATE_EVENT,
             data: event
         })
     }

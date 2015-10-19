@@ -19,9 +19,14 @@ var eventSchema = new mongoose.Schema({
     name: {type: String, required: true},
     date: {type: Date, required: true},
     location: {type: String, required: true, trim: true},
+    address: {type: String},
+    city: {type: String},
+    state: {type: String},
+    zip: {type: String},
     flights: [flightSchema],
     organizations: [ObjectId],
-    organizers: [ObjectId]
+    organizers: [ObjectId],
+    waitList: [golferSchema]
 });
 
 eventSchema.methods.dateToDayString = function() {

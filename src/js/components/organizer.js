@@ -6,10 +6,12 @@ var Typeahead = require('react-typeahead-component');
 var validator = require('validator');
 var eventActions = require('../actions/eventActions');
 var playerActions = require('../actions/playerActions');
-import { Router, Route, Link, History } from 'react-router'
-import createBrowserHistory from 'history/lib/createBrowserHistory'
+import organizationActions from '../actions/organizationActions';
+import { Router, Route, Link, History } from 'react-router';
+import createBrowserHistory from 'history/lib/createBrowserHistory';
 import playerStore from '../stores/playerStore';
 import eventStore from '../stores/eventStore';
+import organizationStore from '../stores/organizationStore'
 import DatePicker from 'react-date-picker';
 import moment from 'moment';
 import TimePicker from 'react-time-picker';
@@ -64,6 +66,12 @@ var OrgForm = React.createClass({
     getDefaultProps: function() {
         return {formClass: "edit-form"}; // edit-form for update (with save button and delete button), show-form for show (read only with edit button)
     },
+    componentDidMount: function() {
+        organizationStore.addChangeListener(this._onChange);
+    },
+    componentWillUnmount: function() {
+        organizationStore.removeChangeListener(this._onChange);
+    },
     handleSubmit: function() {
         validator.trim(this.state.orgName);
     },
@@ -104,6 +112,12 @@ var UserForm = React.createClass({
     },
     getDefaultProps: function() {
         return {formClass: "edit-form"};
+    },
+    componentDidMount: function() {
+        playerStore.addChangeListener(this._onChange);
+    },
+    componentWillUnmount: function() {
+        playerStore.removeChangeListener(this._onChange);
     },
     handleSubmit: function() {
         this.state.email = normalizeEmail(this.state.email);
@@ -259,6 +273,12 @@ var EventForm = React.createClass({
     getDefaultProps: function() {
         return {formClass: "edit",
             flights: im.List([im.Map({maxPlayers: '4', time: '7:00 AM', key: uuid.v4()})])}
+    },
+    componentDidMount: function() {
+        eventStore.addChangeListener(this._onChange);
+    },
+    componentWillUnmount: function() {
+        eventStore.removeChangeListener(this._onChange);
     },
     onDateChange: function(dateString, moment){
         this.setState({date: dateString});
