@@ -85,6 +85,7 @@ var addEventToStore = function(event) {
         timeout: 3000
     }).done(function (data) {
         store = store.updateIn(["events"], val => val.push(event));
+        eventStore.emit(appConstants.CHANGE_EVENT); // note this must be here so that the emit happens after the update
     }).fail(function (err) {
         alert("Unable to update server. Try again later.")
     });

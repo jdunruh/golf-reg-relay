@@ -283,6 +283,26 @@ var EventForm = React.createClass({
     componentWillUnmount: function() {
         eventStore.removeChangeListener(this._onChange);
     },
+    clearForm: function() {
+        var orgs = organizationStore.getOrgs();
+        this.replaceState({
+            organizations: orgs,
+            orgSelect: [orgs[0]],
+            name: this.props.name || '',
+            date: this.props.date || moment().format('YYYY-MM-DD'),
+            course: this.props.course || '',
+            address: this.props.address || '',
+            city: this.props.city || '',
+            state: this.props.state || '',
+            zip: this.props.zip || '',
+            flights: this.props.flights.map(function (el) {
+                return addUuid(el);
+            })
+        })
+    },
+    _onChange: function() {
+        this.clearForm();
+    },
     onDateChange: function(dateString, moment){
         this.setState({date: dateString});
     },
@@ -345,7 +365,7 @@ var EventForm = React.createClass({
     handleTextBoxChange: function(field, e) {
         e.preventDefault();
         var tempState = {};
-        tempState[field] = validator.trim(e.target.value);
+        tempState[field] = validator.ltrim(e.target.value);
         this.setState(tempState);
     },
     handleTimeChange: function(flightIndex, newValue) {
@@ -457,7 +477,7 @@ var EventForm = React.createClass({
                 <h3>Tee Times for This Event</h3>
                     {flights}
                 <div className="clearfix">
-                    <button className="btn cancel">Cancel</button>
+                    <button className="btn cancel" onClick={this.clearForm}>Cancel</button>
                     <button className="btn accept" disabled={!this.isDisabled()} onClick={this.handleSubmit}>Save</button>
                 </div>
             </form>
