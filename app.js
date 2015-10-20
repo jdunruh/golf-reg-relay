@@ -22,6 +22,7 @@ var expressValidator = require('express-validator');
 var session = require('express-session');
 var users = require('./routes/users');
 var eventAPI = require('./routes/event-api');
+var orgAPI = require('./routes/organizations-api');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
 
@@ -95,6 +96,7 @@ app.use('/players', playersRoute);
 app.use('/events', events);
 app.use('/', login);
 app.use('/organizations', organizationsRoute);
+app.use('/organization-api', orgAPI);
 app.get('/organizers/*', function(req, res) {
     res.sendFile(path.resolve(__dirname, 'public', 'organizers.html'))
 });

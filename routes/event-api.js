@@ -11,22 +11,25 @@ var players = require('../models/player-model');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
-var validateEvent = function(event) {
-/*
-    event.name = validator.trim(event.name);
-    event.location = validator.trim(event.location);
-    return validator.notEmpty(event.name) &&
-     validator.isLength(event.name, 5, 100) &&
-        !validator.isNull(event.location) &&
-        validator.isLength(event.location, 5,100) &&
-        event.flights.reduce(function(acc, el) {
-         return  acc &&
+var validateFlights = function(flights) {
+    return flights.reduce(function(acc, el) {
+        return  acc &&
             validator.isInt(el.maxPlayers, {min: 1, max:6}) &&
             !validator.isNull(el.time);
-        }, true) &&
-        validator.isAfter(event.date);
-*/
-    return true;
+    }, true)
+};
+
+var validateEvent = function(event) {
+    event.name = validator.trim(event.name);
+    event.location = validator.trim(event.location);
+    return !validator.isNull(event.name) &&
+         validator.isLength(event.name, 5, 100) &&
+        !validator.isNull(event.location) &&
+        validator.isLength(event.location, 5,100) &&
+        validateFlights(event.flights) &&
+//       validator.isAfter(event.date) &&
+        validator.isInt(event.zip);
+        validator.isLength(event.zip, {min:5, max:5});
     };
 
 

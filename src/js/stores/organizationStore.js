@@ -7,7 +7,8 @@ var EventEmitter = require('events').EventEmitter;
 var $ = require('jquery');
 
 
-var store = new im.Map({});
+var store = new im.List();
+var storeById = new im.Map()
 
 var resetStore = function() {
     store = new im.Map()
@@ -17,11 +18,12 @@ var getInitialDataFromServer = function () {
     $.ajax({
         dataType: "json",
         method: "get",
-        url: window.location.origin + "/api/getAllEvents",
+        url: window.location.origin + "/organization-api/getAllOrganizations",
         timeout: 3000
     }).done(function (data) {
         var temp = im.fromJS(data);
-        store = temp.reduce((acc, el) => acc.set(el.get('_id'), el), im.Map());
+        store = temp;
+        storeById = temp.reduce((acc, el) => acc.set(el.get('_id'), el), im.Map());
     }).fail(function (err) {
         console.log(err);
         alert("Initial Data Pull Failed. Try again later.");

@@ -119,3 +119,6 @@ html {
 
 .time-picker {
   float: left; }
+
+.date-picker {
+  width: 250px; }

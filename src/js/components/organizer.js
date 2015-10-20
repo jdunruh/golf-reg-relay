@@ -257,9 +257,12 @@ var addUuid = function(flight) {
 
 var EventForm = React.createClass({
     getInitialState: function() {
+        var orgs = organizationStore.getOrgs();
         return {
+                organizations: orgs,
+                orgSelect: [orgs[0]],
                 name: this.props.name || '',
-                date: this.props.date || moment(),
+                date: this.props.date || moment().format('YYYY-MM-DD'),
                 course: this.props.course || '',
                 address: this.props.address || '',
                 city: this.props.city || '',
@@ -369,25 +372,30 @@ var EventForm = React.createClass({
         event.zip = this.state.zip;
         event.date = this.state.date;
         event.flights = this.state.flights;
+        event.organizations = this.state.orgSelect;
         eventActions.addEvent(im.Map(event));
+    },
+    handleSelectChange: function(e) {
+        this.setState({orgSelect: e.target.value});
     },
     render: function() {
         var _this = this;
         var length = this.state.flights.size;
         var formClass = this.props.formClass;
-        var flights = this.state.flights.map(function(el, index) {
+        var flights = this.state.flights.map(function (el, index) {
             return <FlightForm key={el.get('key')}
-                time = {el.get('time')}
-                maxPlayers = {el.get('maxPlayers')}
-                last = { index === (length - 1)}
-                formClass = {formClass}
-                addFlight = {_this.addFlight}
-                removeFlight = {_this.removeFlight.bind(_this, index)}
-                handleTimeChange = {_this.handleTimeChange.bind(_this, index)}
-                handleMaxPlayersChange = {_this.handleMaxPlayersChange.bind(_this, index)}
-                validateNumberOfPlayers = {_this.validateNumberOfPlayers(_this.state.flights.getIn([index, 'maxPlayers']))}/>
+                               time={el.get('time')}
+                               maxPlayers={el.get('maxPlayers')}
+                               last={ index === (length - 1)}
+                               formClass={formClass}
+                               addFlight={_this.addFlight}
+                               removeFlight={_this.removeFlight.bind(_this, index)}
+                               handleTimeChange={_this.handleTimeChange.bind(_this, index)}
+                               handleMaxPlayersChange={_this.handleMaxPlayersChange.bind(_this, index)}
+                               validateNumberOfPlayers={_this.validateNumberOfPlayers(_this.state.flights.getIn([index, 'maxPlayers']))}/>
         });
-            return <form className = {this.props.formCLass}>
+        var orgOptions = this.state.organizations.map(o => <option key={o.get('_id')} value={o.get('_id')}> {o.get('name')} </option>);
+            return <form className = {"form-box " + this.props.formCLass}>
                 <label>Event Name
                     <ValidatedInput wrappedComponent={<input type="text" value={this.state.name} name="name"
                         onChange={this.handleTextBoxChange.bind(this, "name")}
@@ -397,7 +405,8 @@ var EventForm = React.createClass({
                 </label>
                 <label>Date
                     <DatePicker
-                        minDate={moment()}
+                        class="date-picker"
+                        minDate={moment().format('YYYY-MM-DD')}
                         date={this.state.date}
                         onChange={this.onDateChange}
                         hideFooter = {true}
@@ -438,6 +447,13 @@ var EventForm = React.createClass({
                                     validation={this.validateZip(this.state.zip)}
                                     checkValidity={this.state.checkValidateZip} />
                 </label>
+                <label>Sponsoring Organization(s)
+                    <div>
+                        <select onChange={this.handleSelectChange} value={this.state.orgSelect} multiple>
+                            {orgOptions}
+                        </select>
+                    </div>
+                </label>
                 <h3>Tee Times for This Event</h3>
                     {flights}
                 <div className="clearfix">
@@ -450,6 +466,7 @@ var EventForm = React.createClass({
 
 document.addEventListener("DOMContentLoaded", function () {
     playerStore.getInitialDataFromServer();
+    organizationStore.getInitialDataFromServer();
     eventStore.getInitialDataFromServer(function() {
         React.render((
             <Router history={createBrowserHistory()}>

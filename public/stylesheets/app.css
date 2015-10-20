@@ -411,6 +411,9 @@ label.checkbox-label {
   padding: 5px 10px 5px 10px;
   text-decoration: none; }
 
+.btn:disabled {
+  background-color: #5ef38c; }
+
 .btn:hover {
   text-decoration: none; }
 

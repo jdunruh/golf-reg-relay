@@ -48,6 +48,10 @@ label.checkbox-label {
   text-decoration: none;
 }
 
+.btn:disabled {
+  background-color: $light;
+}
+
 .btn:hover {
   text-decoration: none;
 }
