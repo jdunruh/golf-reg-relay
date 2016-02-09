@@ -25,6 +25,8 @@ app.use(morgan('dev'));
 app.use(express.static('..'));
 var Schema = mongoose.Schema;
 
+var port = process.env.PORT || 3000;
+
 var mongoURL = process.env.MONGOLAB_URI || 'localhost';
 
 
@@ -177,6 +179,6 @@ app.put('/messages', function (req, res) {
     addEmailToDB(req, res)
 });
 
-app.listen(3000, function () {
+app.listen(port, function () {
     console.log("server up")
 });

@@ -331,13 +331,14 @@ const SelectEvent = React.createClass({
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    playerStore.getInitialDataFromServer();
-    eventStore.getInitialDataFromServer(function() {
-        React.render((
-            <Router history={createBrowserHistory()}>
-                <Route path="/" component={SelectEvent} />
-                <Route path="/signup/:id" component={TeeTimeTable}  />
-            </Router>), document.getElementById('container'));
+    playerStore.getInitialDataFromServer(function () {
+        eventStore.getInitialDataFromServer(function () {
+            React.render((
+                <Router history={createBrowserHistory()}>
+                    <Route path="/" component={SelectEvent}/>
+                    <Route path="/signup/:id" component={TeeTimeTable}/>
+                </Router>), document.getElementById('container'));
+        });
     });
 });
 

@@ -45,7 +45,6 @@
     "nodemailer-stub-transport": "^1.0.0",
     "passport": "^0.2.2",
     "passport-local": "^1.0.0",
-    "ramda": "^0.17.1",
     "react-date-picker": "^3.1.7",
     "react-router": "^1.0.0-rc1",
     "react-time-picker": "^1.1.0",

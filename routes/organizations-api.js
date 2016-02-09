@@ -22,27 +22,16 @@ router.get('/getAllOrganizations', function(req, res, next) {
     });
 });
 
+
+
+var validateOrg = function(org) {
+    org.name = validator.trim(org.name);
+    return !validator.isNull(org.name) &&
+            org.organizers != [] &&
+            org.organizers != null &&
+            org.organizers != undefined;
+    };
 /*
-//index
-router.get('/', function(req, res, next) {
-    csp.go(function*() {
-        var result = yield csp.take(persist.getAll(organizations.Org));
-        if( result instanceof Error) {
-            res.status(404).send();
-        } else {
-            console.log('result');
-            res.render('organizations/index.jade', {organizations: result});
-        }
-    });
-});
-
-var validateForm = function(req) {
-    req.sanitize('name').trim();
-    req.sanitize('name').escape();
-    req.check('name', "Name cannot be blank").notEmpty();
-    return req.validationErrors(true);
-};
-
 //create
 router.post('/', function (req, res, next) {
     var mappedErrors = validateForm(req);
@@ -75,13 +64,6 @@ router.post('/', function (req, res, next) {
     }
 });
 
-
-
-//new
-router.get('/new', function(req, res, next) {
-    res.render('organizations/new.jade', {organization: {
-        name: ""}, errors: {}});
-});
 
 //show
 router.get('/:id', function(req, res, next) {

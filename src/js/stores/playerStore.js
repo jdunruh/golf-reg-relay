@@ -20,7 +20,7 @@ var resetStore = function() {
     store = im.List();
 };
 
-var getInitialDataFromServer = function () {
+var getInitialDataFromServer = function (cb) {
     $.ajax({
         dataType: "json",
         method: "get",
@@ -39,6 +39,7 @@ var getInitialDataFromServer = function () {
         store = im.fromJS(data);
         // add metaphone version of name for faster searching
         store = store.map((el) => el.set("metaphone-full" , metaphone(el.get("name"))));
+        cb();
     }).fail(function () {
         alert("Initial Player Data Pull Failed. Try again later.")
     })
