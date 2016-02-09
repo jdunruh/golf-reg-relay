@@ -89,13 +89,12 @@ passport.deserializeUser(function(id, done) {
 });
 
 
-
+app.use('/', login);
 app.use('/api', appAPI);
 app.use('/event-api', eventAPI);
 app.use('/users', users);
 app.use('/players', playersRoute);
 app.use('/events', events);
-app.use('/', login);
 app.use('/organizations', organizationsRoute);
 app.use('/organization-api', orgAPI);
 app.get('/organizers/*', function(req, res) {
