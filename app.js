@@ -88,8 +88,15 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
+var isAuthenticated = function (req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+    res.redirect('/login');
+}
+
 
 app.use('/', login);
+app.use(isAuthenticated);
 app.use('/api', appAPI);
 app.use('/event-api', eventAPI);
 app.use('/users', users);
