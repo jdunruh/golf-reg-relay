@@ -13,10 +13,10 @@ var combiner = require('stream-combiner2');
 var sass = require('gulp-sass');
 
 var path = {
-    HTML: './src/index.html',
+    HTML: './src/signup.html',
     MINIFIED_OUT: 'build.min.js',
     OUT: 'app.js',
-    DEST: './public/index.html',
+    DEST: './public/signup.html',
     DEST_BUILD: './public/javascript',
     DEST_SRC: './public/javascript',
     DEST_CSS: './public/stylesheets',
@@ -34,7 +34,7 @@ var path = {
 gulp.task('copy', function(){
     gulp.src(path.HTML)
         .pipe(gulp.dest(path.DEST))
-        .on('error', function() {console.log('cannot copy index.html')});
+        .on('error', function() {console.log('cannot copy signup.html')});
 });
 
 gulp.task('watch', function() {

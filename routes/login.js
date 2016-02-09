@@ -117,7 +117,7 @@ router.get('/', loginForm);
 router.get('/login', loginForm);
 
 // login
-router.post('/login', passport.authenticate('local', {successRedirect: '/',
+router.post('/login', passport.authenticate('local', {successRedirect: '/signup',
     failureRedirect: '/login'}));
 
 // logout
