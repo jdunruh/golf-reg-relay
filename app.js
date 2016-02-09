@@ -25,6 +25,7 @@ var eventAPI = require('./routes/event-api');
 var orgAPI = require('./routes/organizations-api');
 
 var mongoURI = process.env.MONGOLAB_URI || 'localhost';
+var port = process.env.PORT || 3000;
 
 var app = express();
 
@@ -140,7 +141,7 @@ app.use(function (err, req, res, next) {
 
 mongoose.connect(mongoURI + '/golf-reg');
 
-app.listen(3000);
+app.listen(port);
 
 //console.log("connecting to " + mongoURI + "/golf-reg");
 //console.log(mongooseUri);

@@ -180,5 +180,5 @@ app.put('/messages', function (req, res) {
 });
 
 app.listen(port, function () {
-    console.log("server up")
+    console.log("server up on port " + port)
 });
