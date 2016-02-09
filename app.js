@@ -96,6 +96,7 @@ var isAuthenticated = function (req, res, next) {
 
 
 app.use('/', login);
+app.use(isAuthenticated);
 app.use('/api', appAPI);
 app.use('/event-api', eventAPI);
 app.use('/users', users);
@@ -107,7 +108,7 @@ app.get('/signup', function(req, res) {
    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
 });
 app.get('/signup/*', function(req, res) {
-    res.sendFile(path.resolve('signup.html'))
+    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
 });
 app.get('/organizers/*', function(req, res) {
     res.sendFile(path.resolve(__dirname, 'public', 'organizers.html'))
