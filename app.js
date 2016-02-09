@@ -104,10 +104,10 @@ app.use('/events', events);
 app.use('/organizations', organizationsRoute);
 app.use('/organization-api', orgAPI);
 app.get('/signup', function(req, res) {
-    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
+    res.sendFile(path.resolve( 'signup.html'))
 });
 app.get('/signup/*', function(req, res) {
-    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
+    res.sendFile(path.resolve('signup.html'))
 });
 app.get('/organizers/*', function(req, res) {
     res.sendFile(path.resolve(__dirname, 'public', 'organizers.html'))
