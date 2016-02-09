@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "jasmine",
-    "start": "node --harmony bin/www"
+    "start": "node --harmony app.js"
   },
   "author": "John Unruh",
   "license": "Proprietary",
