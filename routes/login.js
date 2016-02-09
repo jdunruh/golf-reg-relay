@@ -110,6 +110,9 @@ const loginForm = function(req, res, next) {
     };
 
 
+// home page is login
+router.get('/', loginForm);
+
 // login screen - index
 router.get('/login', loginForm);
 
