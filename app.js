@@ -106,6 +106,12 @@ app.use('/organization-api', orgAPI);
 app.get('/organizers/*', function(req, res) {
     res.sendFile(path.resolve(__dirname, 'public', 'organizers.html'))
 });
+app.get('/organizers', function(req, res) {
+    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
+});
+app.get('/organizers/*', function(req, res) {
+    res.sendFile(path.resolve(__dirname, 'public', 'signup.html'))
+});
 app.get('*', function(request, response){
     response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 });
