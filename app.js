@@ -96,7 +96,6 @@ var isAuthenticated = function (req, res, next) {
 
 
 app.use('/', login);
-app.use(isAuthenticated);
 app.use('/api', appAPI);
 app.use('/event-api', eventAPI);
 app.use('/users', users);
